@@ -101,3 +101,50 @@ poly_assembler = VectorAssembler(
 df_final = poly_assembler.transform(df_poly) # final structure
 df_final.show(5)
 ```
+
+##  Linear Regression model
+```{python}
+#| eval: true
+#| echo: true
+#| output: true
+lr = LinearRegression(
+    featuresCol="features",
+    labelCol="SALARY",
+    predictionCol="prediction",
+    solver="normal"
+)
+
+lr_model = lr.fit(train_df)
+
+test_results = lr_model.evaluate(test_df)
+
+print("Coefficients:", lr_model.coefficients)
+print("Intercept:", lr_model.intercept)
+print("R²:", test_results.r2)
+print("RMSE:", test_results.rootMeanSquaredError)
+print("MAE:", test_results.meanAbsoluteError)
+
+# Coefficient statistics
+training_summary = lr_model.summary
+
+try:
+    coefs = lr_model.coefficients.toArray().tolist()
+    se = training_summary.coefficientStandardErrors
+    tvals = training_summary.tValues
+    pvals = training_summary.pValues
+
+    coef_df = spark.createDataFrame(
+        [
+            (float(coefs[i]), float(se[i]), float(tvals[i]), float(pvals[i]),
+             float(coefs[i] - 1.96*se[i]), float(coefs[i] + 1.96*se[i]))
+            for i in range(len(coefs))
+        ],
+        ["Coefficient", "StdError", "tValue", "pValue", "CI_lower", "CI_upper"]
+    )
+
+    coef_df.show(truncate=False)
+
+except Exception as e:
+    print("Coefficient statistics not available (L-BGFS fallback):", str(e))
+
+```
