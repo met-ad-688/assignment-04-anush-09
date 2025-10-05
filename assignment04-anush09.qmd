@@ -24,6 +24,9 @@ execute:
 ---
 
 ```{python}
+#| eval: true
+#| echo: true
+#| output: true
 from pyspark.sql import SparkSession
 import pandas as pd
 import plotly.express as px
@@ -40,9 +43,61 @@ spark = SparkSession.builder.appName("LightcastData").getOrCreate()
 # Load Data
 df = spark.read.option("header", "true").option("inferSchema", "true").option("multiLine","true").option("escape", "\"").csv("./data/lightcast_job_postings.csv")
 
-# Show Schema and Sample Data
-print("---This is Diagnostic check, No need to print it in the final doc---")
+# # Show Schema and Sample Data
+# print("---This is Diagnostic check, No need to print it in the final doc---")
 
-# df.printSchema() # comment this line when rendering the submission
-df.show(5)
+# # df.printSchema() # comment this line when rendering the submission
+# df.show(5)
+```
+
+## Feature Engineering
+```{python}
+#| eval: true
+#| echo: true
+#| output: true
+
+from pyspark.sql.functions import col, pow
+from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorAssembler
+from pyspark.ml import Pipeline
+from pyspark.ml.regression import LinearRegression
+
+# Drop missing values
+key_features = [
+    "DURATION", "SALARY_FROM", "SALARY_TO", "MIN_YEARS_EXPERIENCE",
+    "EMPLOYMENT_TYPE_NAME", "STATE_NAME", "SALARY"
+]
+df_clean = df.dropna(subset=key_features)
+
+# Categorical transformations
+cat_cols = ["EMPLOYMENT_TYPE_NAME", "STATE_NAME"]
+indexers = [StringIndexer(inputCol=c, outputCol=c+"_IDX", handleInvalid="keep") for c in cat_cols]
+encoders = [OneHotEncoder(inputCol=c+"_IDX", outputCol=c+"_OHE", dropLast=True) for c in cat_cols]
+
+#  Assemble features
+cont_cols = ["DURATION", "SALARY_FROM", "SALARY_TO", "MIN_YEARS_EXPERIENCE"]
+assembler_inputs = cont_cols + [c+"_OHE" for c in cat_cols]
+
+assembler = VectorAssembler(
+    inputCols=assembler_inputs,
+    outputCol="features"
+)
+
+pipeline = Pipeline(stages=indexers + encoders + [assembler])
+df_transformed = pipeline.fit(df_clean).transform(df_clean)
+
+# Train-test split (80/20)
+train_df, test_df = df_transformed.randomSplit([0.8, 0.2], seed=42)
+
+# Create polynomial feature ( by squaring MIN_YEARS_EXPERIENCE)
+df_poly = df_transformed.withColumn(
+    "MIN_YEARS_EXPERIENCE_SQ", pow(col("MIN_YEARS_EXPERIENCE"), 2)
+)
+
+# Assemble polynomial features into new vector
+poly_assembler = VectorAssembler(
+    inputCols=["features", "MIN_YEARS_EXPERIENCE_SQ"],
+    outputCol="features_poly"
+)
+df_final = poly_assembler.transform(df_poly) # final structure
+df_final.show(5)
 ```
