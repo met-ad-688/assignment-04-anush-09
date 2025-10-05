@@ -146,5 +146,61 @@ try:
 
 except Exception as e:
     print("Coefficient statistics not available (L-BGFS fallback):", str(e))
+# df_final.printSchema()
+```
 
+##  Polynomial Regression model
+```{python}
+#| eval: true
+#| echo: true
+#| output: true
+
+from pyspark.ml.regression import LinearRegression
+
+# train/test
+train_poly, test_poly = df_final.randomSplit([0.8, 0.2], seed=42)
+
+# Linear Regression model using polynomial features
+lr_poly = LinearRegression(
+    featuresCol="features_poly",
+    labelCol="SALARY",
+    predictionCol="prediction",
+    solver="normal"   # may fall back if collinearity exists
+)
+
+#  Fit model on training data
+lr_poly_model = lr_poly.fit(train_poly)
+
+#  Evaluate on test data
+test_poly_results = lr_poly_model.evaluate(test_poly)
+
+print("Polynomial Regression Results")
+print("Coefficients:", lr_poly_model.coefficients)
+print("Intercept:", lr_poly_model.intercept)
+print("R²:", test_poly_results.r2)
+print("RMSE:", test_poly_results.rootMeanSquaredError)
+print("MAE:", test_poly_results.meanAbsoluteError)
+
+# Coefficient statistics
+poly_summary = lr_poly_model.summary
+
+try:
+    coefs = lr_poly_model.coefficients.toArray().tolist()
+    se = poly_summary.coefficientStandardErrors
+    tvals = poly_summary.tValues
+    pvals = poly_summary.pValues
+
+    coef_poly_df = spark.createDataFrame(
+        [
+            (float(coefs[i]), float(se[i]), float(tvals[i]), float(pvals[i]),
+             float(coefs[i] - 1.96*se[i]), float(coefs[i] + 1.96*se[i]))
+            for i in range(len(coefs))
+        ],
+        ["Coefficient", "StdError", "tValue", "pValue", "CI_lower", "CI_upper"]
+    )
+
+    coef_poly_df.show(truncate=False)
+
+except Exception as e:
+    print("Coefficient statistics not available (L-BGFS fallback):", str(e))
 ```

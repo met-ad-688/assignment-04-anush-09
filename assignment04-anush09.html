@@ -85,6 +85,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#feature-engineering" id="toc-feature-engineering" class="nav-link active" data-scroll-target="#feature-engineering"><span class="header-section-number">1</span> Feature Engineering</a></li>
   <li><a href="#linear-regression-model" id="toc-linear-regression-model" class="nav-link" data-scroll-target="#linear-regression-model"><span class="header-section-number">2</span> Linear Regression model</a></li>
+  <li><a href="#polynomial-regression-model" id="toc-polynomial-regression-model" class="nav-link" data-scroll-target="#polynomial-regression-model"><span class="header-section-number">3</span> Polynomial Regression model</a></li>
   </ul>
 </nav>
 </div>
@@ -134,7 +135,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="803c97bc" class="cell" data-execution_count="1">
+<div id="8692f6d8" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.sql <span class="im">import</span> SparkSession</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
@@ -157,12 +158,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># # df.printSchema() # comment this line when rendering the submission</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># df.show(5)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 10:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 28:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 </div>
 <section id="feature-engineering" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="feature-engineering"><span class="header-section-number">1</span> Feature Engineering</h2>
-<div id="a7d8a113" class="cell" data-execution_count="2">
+<div id="5d0b00d6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.sql.functions <span class="im">import</span> col, <span class="bu">pow</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.feature <span class="im">import</span> StringIndexer, OneHotEncoder, VectorAssembler</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml <span class="im">import</span> Pipeline</span>
@@ -208,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> poly_assembler.transform(df_poly) <span class="co"># final structure</span></span>
 <span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>df_final.show(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 11:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 14:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 29:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 32:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>+--------------------+-----------------+----------------------+----------+--------+---------+--------+-------------------+--------------------+--------------------+-----------+-------------------+--------------------+--------------------+---------------+----------------+--------+------------+-----------+-------------------+----------------+---------------------+-------------+-------------------+-------------+------------------+---------------+--------------------+--------------------+--------------------+-------------+------+-----------+----------------+-------------------+---------+-----------+--------------------+--------------------+------------------+------+--------------------+-----+--------------------+-----+----------+---------------+--------------------+---------------+--------------------+------------+--------------------+------------+--------------------+------+--------------------+------+--------------------+------+--------------------+------+--------------------+------+--------------------+------------------+--------------------+--------------------+--------------------+--------------------+--------------------+-----------------------+--------------+-------------------+--------------------+--------------------+--------------------+--------------------+----------+--------------------+----------+--------------------+-----------------+--------------------+---------------+--------------------+------------+--------------------+----------+--------------------+----------+--------------------+----------+---------------+----------+---------------+---------------+--------------------+--------------+--------------------+--------------------------+-------------------------------+--------------------+-------------------------+-----------------------------+----------------------------------+-----------------+----------------------+-----------------------+----------------------------+------------------+-----------------------+-------+--------------------+-------+--------------------+-------+---------------+-------+---------------+-----------------+----------------------+------------+--------------------+------------+--------------------+------------+--------------------+------------+--------------------+------------+--------------------+------------------------+--------------+------------------------+---------------+--------------------+-----------------------+--------------------+
@@ -227,7 +228,7 @@ only showing top 5 rows
 </section>
 <section id="linear-regression-model" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="linear-regression-model"><span class="header-section-number">2</span> Linear Regression model</h2>
-<div id="02594459" class="cell" data-execution_count="3">
+<div id="0f1943f9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> LinearRegression(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
@@ -266,13 +267,14 @@ only showing top 5 rows
 <span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    coef_df.show(truncate<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co"># df_final.printSchema()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>25/10/05 20:28:44 WARN Instrumentation: [ea093d81] regParam is zero, which might cause numerical instability and overfitting.
-[Stage 18:&gt;                                                         (0 + 1) / 1]                                                                                25/10/05 20:28:58 WARN Instrumentation: [ea093d81] Cholesky solver failed due to singular covariance matrix. Retrying with Quasi-Newton solver.
-25/10/05 20:29:01 ERROR LBFGS: Failure! Resetting history: breeze.optimize.FirstOrderException: Line search zoom failed
-25/10/05 20:29:01 ERROR LBFGS: Failure again! Giving up and returning. Maybe the objective is just poorly behaved?
-[Stage 19:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 20:&gt;                                                         (0 + 1) / 1]</code></pre>
+<pre><code>25/10/05 23:45:20 WARN Instrumentation: [900789dc] regParam is zero, which might cause numerical instability and overfitting.
+[Stage 36:&gt;                                                         (0 + 1) / 1]                                                                                25/10/05 23:45:29 WARN Instrumentation: [900789dc] Cholesky solver failed due to singular covariance matrix. Retrying with Quasi-Newton solver.
+25/10/05 23:45:29 ERROR LBFGS: Failure! Resetting history: breeze.optimize.FirstOrderException: Line search zoom failed
+25/10/05 23:45:29 ERROR LBFGS: Failure again! Giving up and returning. Maybe the objective is just poorly behaved?
+[Stage 37:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 38:&gt;                                                         (0 + 1) / 1]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Coefficients: [0.10563152045569209,0.4897751120724572,0.5031412326612038,5.773710722290375,-63.115251718427764,-37.27294361077609,240.2447536424352,48.28905228724214,152.97731178817043,-176.76444352347002,85.32078244557229,434.31107591181194,-161.42210604426688,-15.64830522171917,-118.89077831720422,-161.50709805263935,-102.29516054826503,202.42808164805962,-141.2817953243975,-10.32020301607594,46.18816831539249,-139.76373644664173,-91.81496859446824,756.317264882235,88.88905495051843,-194.05850992593858,92.43669393544265,-238.67611076456086,-232.87231355801723,49.66106151771092,-169.18948201345887,-145.49464357197618,-121.94396988453119,-99.67611326089163,-159.8019234628744,-201.918731989524,-187.9895377248494,-97.41938626160349,-200.93107641768572,-193.21188031918769,-224.31671170927174,50.54351633138335,42.18430464712873,-80.66195902772107,-132.28848009722148,-134.87752196095306,-191.24898569496906,-161.93087666331286,147.52497548288048,344.72942760491645,172.62127629059256,-142.25334903487825,-192.07562978162065,-86.70013792913477,-139.9344616195547,-118.81727997673464,374.3725761242867,-225.9377085629826]
@@ -280,6 +282,76 @@ Intercept: 771.0116013589636
 R²: 0.9991007611912691
 RMSE: 1269.8327108598858
 MAE: 439.36288683419514
+Coefficient statistics not available (L-BGFS fallback): No Std. Error of coefficients available for this LinearRegressionModel</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>                                                                                </code></pre>
+</div>
+</div>
+</section>
+<section id="polynomial-regression-model" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="polynomial-regression-model"><span class="header-section-number">3</span> Polynomial Regression model</h2>
+<div id="56d1e244" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> LinearRegression</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># train/test</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>train_poly, test_poly <span class="op">=</span> df_final.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Regression model using polynomial features</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>lr_poly <span class="op">=</span> LinearRegression(</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features_poly"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    predictionCol<span class="op">=</span><span class="st">"prediction"</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    solver<span class="op">=</span><span class="st">"normal"</span>   <span class="co"># may fall back if collinearity exists</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#  Fit model on training data</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>lr_poly_model <span class="op">=</span> lr_poly.fit(train_poly)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#  Evaluate on test data</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>test_poly_results <span class="op">=</span> lr_poly_model.evaluate(test_poly)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Polynomial Regression Results"</span>)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficients:"</span>, lr_poly_model.coefficients)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Intercept:"</span>, lr_poly_model.intercept)</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, test_poly_results.r2)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, test_poly_results.rootMeanSquaredError)</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, test_poly_results.meanAbsoluteError)</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficient statistics</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>poly_summary <span class="op">=</span> lr_poly_model.summary</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    coefs <span class="op">=</span> lr_poly_model.coefficients.toArray().tolist()</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> poly_summary.coefficientStandardErrors</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    tvals <span class="op">=</span> poly_summary.tValues</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    pvals <span class="op">=</span> poly_summary.pValues</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    coef_poly_df <span class="op">=</span> spark.createDataFrame(</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>            (<span class="bu">float</span>(coefs[i]), <span class="bu">float</span>(se[i]), <span class="bu">float</span>(tvals[i]), <span class="bu">float</span>(pvals[i]),</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>             <span class="bu">float</span>(coefs[i] <span class="op">-</span> <span class="fl">1.96</span><span class="op">*</span>se[i]), <span class="bu">float</span>(coefs[i] <span class="op">+</span> <span class="fl">1.96</span><span class="op">*</span>se[i]))</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(coefs))</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"Coefficient"</span>, <span class="st">"StdError"</span>, <span class="st">"tValue"</span>, <span class="st">"pValue"</span>, <span class="st">"CI_lower"</span>, <span class="st">"CI_upper"</span>]</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>    coef_poly_df.show(truncate<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>25/10/05 23:45:45 WARN Instrumentation: [eb6f5599] regParam is zero, which might cause numerical instability and overfitting.
+[Stage 39:&gt;                                                         (0 + 1) / 1]                                                                                25/10/05 23:45:53 WARN Instrumentation: [eb6f5599] Cholesky solver failed due to singular covariance matrix. Retrying with Quasi-Newton solver.
+[Stage 40:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 41:&gt;                                                         (0 + 1) / 1]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Polynomial Regression Results
+Coefficients: [0.10850158433190565,0.4898438510027623,0.5031386615398417,-7.369893273140783,-61.58544889117296,-36.4478315618234,234.56243206109082,47.63832299759531,153.3247074295653,-176.24011616083303,83.9205602857122,434.0951183273462,-161.98060044889456,-15.339793242565229,-119.39030191453558,-162.00166320812784,-102.06899812189593,201.41838109494367,-140.19328318639484,-9.162090829635456,45.469109853001946,-139.6059513110587,-90.99761339385464,755.793191693108,91.33546027532637,-192.36168411359054,92.07399507622439,-238.8385841326005,-232.767896298693,46.99603630531332,-168.57186538636012,-145.87170696446023,-122.64604693658401,-97.94116341243699,-155.67620594160275,-202.73403259101858,-187.78844087589434,-98.10316312284294,-200.82215679539658,-192.62293751724698,-224.50233074333158,52.63622750638551,43.9719351660064,-81.21451852669436,-131.62319956241677,-134.85832156877655,-191.4617131221021,-162.90130494679153,146.18537947662637,341.3657984587936,171.7554855809047,-142.90361287812377,-195.21297877315428,-85.02141969224462,-139.28109335975378,-118.74269582565961,376.72022762509926,-225.57603759944323,0.9636754780906975]
+Intercept: 795.5247690071019
+R²: 0.9991016331165933
+RMSE: 1269.2169301518693
+MAE: 438.792674933292
 Coefficient statistics not available (L-BGFS fallback): No Std. Error of coefficients available for this LinearRegressionModel</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
