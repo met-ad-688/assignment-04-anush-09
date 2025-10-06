@@ -248,3 +248,198 @@ print("R²:", r2)
 print("RMSE:", rmse)
 print("MAE:", mae)
 ```
+
+### Feature Importance Plot
+
+```{python}
+#| eval: true
+#| echo: true
+#| output: true
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# OHE vector size
+ohe_sizes = {c+"_OHE": df_transformed.select(c+"_OHE").head()[0].size for c in cat_cols}
+
+# Expanded feature names
+expanded_feature_names = []
+for col in cont_cols:
+    expanded_feature_names.append(col)
+
+for c in cat_cols:
+    for i in range(ohe_sizes[c+"_OHE"]):
+        expanded_feature_names.append(f"{c}_{i}")
+
+# Now expanded_feature_names should match the length of rf_model.featureImportances
+importances = rf_model.featureImportances.toArray()
+
+feat_imp = pd.DataFrame({
+    "feature": expanded_feature_names,
+    "importance": importances
+})
+
+# Top 10 plot
+top10 = feat_imp.sort_values("importance", ascending=False).head(10)
+
+plt.figure(figsize=(10,6))
+sns.barplot(x="importance", y="feature", data=top10, palette="viridis")
+plt.title("Top 10 Feature Importances - Random Forest")
+plt.tight_layout()
+plt.savefig("_output/rf_feature_importance.png")
+plt.show()
+plt.close()
+```
+
+## Model Comparison
+
+```{python}
+#| eval: true
+#| echo: true
+#| output: true
+
+import pandas as pd
+import numpy as np
+from pyspark.ml.evaluation import RegressionEvaluator
+
+# Predictions for all three models
+lr_predictions = lr_model.transform(test_df)
+poly_predictions = lr_poly_model.transform(test_poly)
+rf_predictions = rf_model.transform(test_rf)
+
+# Metrics calculation for all models
+evaluator = RegressionEvaluator(labelCol="SALARY", predictionCol="prediction")
+
+# Linear Regression metrics
+lr_r2 = evaluator.setMetricName("r2").evaluate(lr_predictions)
+lr_rmse = evaluator.setMetricName("rmse").evaluate(lr_predictions)
+lr_mae = evaluator.setMetricName("mae").evaluate(lr_predictions)
+
+# Get AIC for Linear Regression
+try:
+    lr_aic = lr_model.summary.aic
+except AttributeError:
+    # Calculate AIC manually
+    n_obs_lr = lr_predictions.count()
+    k_lr = len(lr_model.coefficients) + 1  # +1 for intercept
+    lr_rmse_val = lr_rmse
+    # AIC = n * log(2π * MSE) + 2k
+    lr_aic = n_obs_lr * np.log(2 * np.pi * lr_rmse_val**2) + 2 * k_lr
+
+# Polynomial Regression metrics
+poly_r2 = evaluator.setMetricName("r2").evaluate(poly_predictions)
+poly_rmse = evaluator.setMetricName("rmse").evaluate(poly_predictions)
+poly_mae = evaluator.setMetricName("mae").evaluate(poly_predictions)
+
+# AIC for Polynomial Regression
+try:
+    poly_aic = lr_poly_model.summary.aic
+except AttributeError:
+    # Calculate AIC manually
+    n_obs_poly = poly_predictions.count()
+    k_poly = len(lr_poly_model.coefficients) + 1  # +1 for intercept
+    poly_rmse_val = poly_rmse
+    # AIC = n * log(2π * MSE) + 2k
+    poly_aic = n_obs_poly * np.log(2 * np.pi * poly_rmse_val**2) + 2 * k_poly
+
+# Random Forest metrics
+rf_aic = None  # AIC not directly available for Random Forest
+
+# BIC calculation for Linear and Polynomial models
+def calculate_bic(model_summary, n_obs):
+    """Calculate BIC for PySpark Linear Regression models"""
+    try:
+        k = len(model_summary.coefficientStandardErrors) + 1  # +1 for intercept
+        deviance = model_summary.deviance
+        dispersion = model_summary.devianceResiduals.select("residuals").rdd.map(lambda x: x[0]**2).mean()
+
+        # Log Likelihood calculation
+        log_likelihood = -0.5 * (n_obs * np.log(2 * np.pi) + n_obs * np.log(dispersion) + deviance/dispersion)
+
+        # BIC calculation
+        bic = k * np.log(n_obs) - 2 * log_likelihood
+        return bic
+    except:
+        return None
+
+# Number of observations
+n_obs = test_df.count()
+
+lr_bic = calculate_bic(lr_model.summary, n_obs)
+poly_bic = calculate_bic(lr_poly_model.summary, n_obs)
+
+# Comparison DataFrame
+comparison_data = {
+    'Model': ['Linear Regression', 'Polynomial Regression', 'Random Forest'],
+    'R²': [lr_r2, poly_r2, r2],
+    'RMSE': [lr_rmse, poly_rmse, rmse],
+    'MAE': [lr_mae, poly_mae, mae],
+    'AIC': [lr_aic, poly_aic, 'N/A'],
+    'BIC': [lr_bic, poly_bic, 'N/A']
+}
+
+comparison_df = pd.DataFrame(comparison_data)
+print("Model Comparison:")
+print(comparison_df.to_string(index=False))
+```
+
+### Visualization Comparison
+
+```{python}
+#| eval: true
+#| echo: true
+#| output: true
+
+import matplotlib.pyplot as plt
+
+# Convert predictions to pandas for plotting
+lr_pd = lr_predictions.select("SALARY", "prediction").toPandas()
+poly_pd = poly_predictions.select("SALARY", "prediction").toPandas()
+rf_pd = rf_predictions.select("SALARY", "prediction").toPandas()
+
+# .q    2x2 grid plot
+fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+fig.suptitle('Model Predictions vs Actual Values', fontsize=16)
+
+# Linear Regression
+axes[0, 0].scatter(lr_pd['SALARY'], lr_pd['prediction'], alpha=0.6, color='blue')
+axes[0, 0].plot([lr_pd['SALARY'].min(), lr_pd['SALARY'].max()],
+                [lr_pd['SALARY'].min(), lr_pd['SALARY'].max()], 'r--', lw=2)
+axes[0, 0].set_xlabel('Actual Salary')
+axes[0, 0].set_ylabel('Predicted Salary')
+axes[0, 0].set_title(f'Linear Regression (R² = {lr_r2:.3f})')
+axes[0, 0].grid(True, alpha=0.3)
+
+# Polynomial Regression
+axes[0, 1].scatter(poly_pd['SALARY'], poly_pd['prediction'], alpha=0.6, color='green')
+axes[0, 1].plot([poly_pd['SALARY'].min(), poly_pd['SALARY'].max()],
+                [poly_pd['SALARY'].min(), poly_pd['SALARY'].max()], 'r--', lw=2)
+axes[0, 1].set_xlabel('Actual Salary')
+axes[0, 1].set_ylabel('Predicted Salary')
+axes[0, 1].set_title(f'Polynomial Regression (R² = {poly_r2:.3f})')
+axes[0, 1].grid(True, alpha=0.3)
+
+# Random Forest
+axes[1, 0].scatter(rf_pd['SALARY'], rf_pd['prediction'], alpha=0.6, color='orange')
+axes[1, 0].plot([rf_pd['SALARY'].min(), rf_pd['SALARY'].max()],
+                [rf_pd['SALARY'].min(), rf_pd['SALARY'].max()], 'r--', lw=2)
+axes[1, 0].set_xlabel('Actual Salary')
+axes[1, 0].set_ylabel('Predicted Salary')
+axes[1, 0].set_title(f'Random Forest (R² = {r2:.3f})')
+axes[1, 0].grid(True, alpha=0.3)
+
+# Model comparison bar chart
+axes[1, 1].bar(['Linear', 'Polynomial', 'Random Forest'],
+               [lr_r2, poly_r2, r2],
+               color=['blue', 'green', 'orange'], alpha=0.7)
+axes[1, 1].set_ylabel('R² Score')
+axes[1, 1].set_title('Model Performance Comparison (R²)')
+axes[1, 1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig("_output/model_comparison.png", dpi=300, bbox_inches='tight')
+plt.show()
+plt.close()
+```
+
