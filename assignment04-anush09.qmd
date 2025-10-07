@@ -59,7 +59,7 @@ df = spark.read.option("header", "true").option("inferSchema", "true").option("m
 from pyspark.sql.functions import col, pow
 from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorAssembler
 from pyspark.ml import Pipeline
-from pyspark.ml.regression import LinearRegression
+from pyspark.ml.regression import GeneralizedLinearRegression
 
 # Drop missing values
 key_features = [
@@ -87,6 +87,7 @@ df_transformed = pipeline.fit(df_clean).transform(df_clean)
 
 # Train-test split (80/20)
 train_df, test_df = df_transformed.randomSplit([0.8, 0.2], seed=42)
+# 80% for training and 20% for testing to ensure enough data for model training and validation.
 
 # Create polynomial feature ( by squaring MIN_YEARS_EXPERIENCE)
 df_poly = df_transformed.withColumn(
@@ -102,29 +103,31 @@ df_final = poly_assembler.transform(df_poly) # final structure
 df_final.show(5)
 ```
 
-##  Linear Regression model
+##  Generalized Linear Regression model
 ```{python}
 #| eval: true
 #| echo: true
 #| output: true
-lr = LinearRegression(
+lr = GeneralizedLinearRegression(
+    family="gaussian",
+    link="identity",
     featuresCol="features",
     labelCol="SALARY",
-    predictionCol="prediction",
-    solver="normal",
-    regParam=0.1,
-    elasticNetParam=0.0
+    maxIter=10,
+    regParam=0.3
 )
 
 lr_model = lr.fit(train_df)
 
-test_results = lr_model.evaluate(test_df)
+from pyspark.ml.evaluation import RegressionEvaluator
+lr_predictions = lr_model.transform(test_df)
+evaluator = RegressionEvaluator(labelCol="SALARY", predictionCol="prediction")
 
 print("Coefficients:", lr_model.coefficients)
 print("Intercept:", lr_model.intercept)
-print("R²:", test_results.r2)
-print("RMSE:", test_results.rootMeanSquaredError)
-print("MAE:", test_results.meanAbsoluteError)
+print("R²:", evaluator.setMetricName("r2").evaluate(lr_predictions))
+print("RMSE:", evaluator.setMetricName("rmse").evaluate(lr_predictions))
+print("MAE:", evaluator.setMetricName("mae").evaluate(lr_predictions))
 
 # Coefficient statistics
 training_summary = lr_model.summary
@@ -157,33 +160,34 @@ except Exception as e:
 #| echo: true
 #| output: true
 
-from pyspark.ml.regression import LinearRegression
+from pyspark.ml.regression import GeneralizedLinearRegression
 
 # train/test
 train_poly, test_poly = df_final.randomSplit([0.8, 0.2], seed=42)
 
 # Linear Regression model using polynomial features
-lr_poly = LinearRegression(
+lr_poly = GeneralizedLinearRegression(
+    family="gaussian",
+    link="identity",
     featuresCol="features_poly",
     labelCol="SALARY",
-    predictionCol="prediction",
-    solver="normal",
-    regParam=0.1,
-    elasticNetParam=0.0
+    maxIter=10,
+    regParam=0.3
 )
 
 #  Fit model on training data
 lr_poly_model = lr_poly.fit(train_poly)
 
-#  Evaluate on test data
-test_poly_results = lr_poly_model.evaluate(test_poly)
+from pyspark.ml.evaluation import RegressionEvaluator
+poly_predictions = lr_poly_model.transform(test_poly)
+evaluator = RegressionEvaluator(labelCol="SALARY", predictionCol="prediction")
 
 print("Polynomial Regression Results")
 print("Coefficients:", lr_poly_model.coefficients)
 print("Intercept:", lr_poly_model.intercept)
-print("R²:", test_poly_results.r2)
-print("RMSE:", test_poly_results.rootMeanSquaredError)
-print("MAE:", test_poly_results.meanAbsoluteError)
+print("R²:", evaluator.setMetricName("r2").evaluate(poly_predictions))
+print("RMSE:", evaluator.setMetricName("rmse").evaluate(poly_predictions))
+print("MAE:", evaluator.setMetricName("mae").evaluate(poly_predictions))
 
 # Coefficient statistics
 poly_summary = lr_poly_model.summary
@@ -272,7 +276,6 @@ for c in cat_cols:
     for i in range(ohe_sizes[c+"_OHE"]):
         expanded_feature_names.append(f"{c}_{i}")
 
-# Now expanded_feature_names should match the length of rf_model.featureImportances
 importances = rf_model.featureImportances.toArray()
 
 feat_imp = pd.DataFrame({
@@ -308,7 +311,6 @@ lr_predictions = lr_model.transform(test_df)
 poly_predictions = lr_poly_model.transform(test_poly)
 rf_predictions = rf_model.transform(test_rf)
 
-# Metrics calculation for all models
 evaluator = RegressionEvaluator(labelCol="SALARY", predictionCol="prediction")
 
 # Linear Regression metrics
@@ -316,16 +318,9 @@ lr_r2 = evaluator.setMetricName("r2").evaluate(lr_predictions)
 lr_rmse = evaluator.setMetricName("rmse").evaluate(lr_predictions)
 lr_mae = evaluator.setMetricName("mae").evaluate(lr_predictions)
 
-# Get AIC for Linear Regression
-try:
-    lr_aic = lr_model.summary.aic
-except AttributeError:
-    # Calculate AIC manually
-    n_obs_lr = lr_predictions.count()
-    k_lr = len(lr_model.coefficients) + 1  # +1 for intercept
-    lr_rmse_val = lr_rmse
-    # AIC = n * log(2π * MSE) + 2k
-    lr_aic = n_obs_lr * np.log(2 * np.pi * lr_rmse_val**2) + 2 * k_lr
+# AIC for Linear Regression
+lr_aic = lr_model.summary.aic
+print(f"Linear Regression AIC: {lr_aic}")
 
 # Polynomial Regression metrics
 poly_r2 = evaluator.setMetricName("r2").evaluate(poly_predictions)
@@ -333,26 +328,19 @@ poly_rmse = evaluator.setMetricName("rmse").evaluate(poly_predictions)
 poly_mae = evaluator.setMetricName("mae").evaluate(poly_predictions)
 
 # AIC for Polynomial Regression
-try:
-    poly_aic = lr_poly_model.summary.aic
-except AttributeError:
-    # Calculate AIC manually
-    n_obs_poly = poly_predictions.count()
-    k_poly = len(lr_poly_model.coefficients) + 1  # +1 for intercept
-    poly_rmse_val = poly_rmse
-    # AIC = n * log(2π * MSE) + 2k
-    poly_aic = n_obs_poly * np.log(2 * np.pi * poly_rmse_val**2) + 2 * k_poly
+poly_aic = lr_poly_model.summary.aic
+print(f"Polynomial Regression AIC: {poly_aic}")
 
-# Random Forest metrics
-rf_aic = None  # AIC not directly available for Random Forest
+# AIC is not directly available for Random Forest
+rf_aic = None
 
 # BIC calculation for Linear and Polynomial models
 def calculate_bic(model_summary, n_obs):
-    """Calculate BIC for PySpark Linear Regression models"""
+    """Calculate BIC for PySpark GeneralizedLinearRegression models"""
     try:
-        k = len(model_summary.coefficientStandardErrors) + 1  # +1 for intercept
+        k = len(model_summary.coefficientStandardErrors) + 1
         deviance = model_summary.deviance
-        dispersion = model_summary.devianceResiduals.select("residuals").rdd.map(lambda x: x[0]**2).mean()
+        dispersion = model_summary.dispersion
 
         # Log Likelihood calculation
         log_likelihood = -0.5 * (n_obs * np.log(2 * np.pi) + n_obs * np.log(dispersion) + deviance/dispersion)
@@ -360,18 +348,20 @@ def calculate_bic(model_summary, n_obs):
         # BIC calculation
         bic = k * np.log(n_obs) - 2 * log_likelihood
         return bic
-    except:
+    except Exception as e:
+        print(f"BIC calculation failed: {str(e)}")
         return None
 
-# Number of observations
 n_obs = test_df.count()
 
 lr_bic = calculate_bic(lr_model.summary, n_obs)
 poly_bic = calculate_bic(lr_poly_model.summary, n_obs)
 
-# Comparison DataFrame
+print(f"Linear Regression BIC: {lr_bic}")
+print(f"Polynomial Regression BIC: {poly_bic}")
+
 comparison_data = {
-    'Model': ['Linear Regression', 'Polynomial Regression', 'Random Forest'],
+    'Model': ['Generalized Linear Regression', 'Polynomial Regression', 'Random Forest'],
     'R²': [lr_r2, poly_r2, r2],
     'RMSE': [lr_rmse, poly_rmse, rmse],
     'MAE': [lr_mae, poly_mae, mae],
@@ -390,19 +380,17 @@ print(comparison_df.to_string(index=False))
 #| eval: true
 #| echo: true
 #| output: true
-
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Convert predictions to pandas for plotting
 lr_pd = lr_predictions.select("SALARY", "prediction").toPandas()
 poly_pd = poly_predictions.select("SALARY", "prediction").toPandas()
 rf_pd = rf_predictions.select("SALARY", "prediction").toPandas()
 
-# .q    2x2 grid plot
 fig, axes = plt.subplots(2, 2, figsize=(15, 12))
 fig.suptitle('Model Predictions vs Actual Values', fontsize=16)
 
-# Linear Regression
+# Generalized Linear Regression
 axes[0, 0].scatter(lr_pd['SALARY'], lr_pd['prediction'], alpha=0.6, color='blue')
 axes[0, 0].plot([lr_pd['SALARY'].min(), lr_pd['SALARY'].max()],
                 [lr_pd['SALARY'].min(), lr_pd['SALARY'].max()], 'r--', lw=2)
@@ -429,11 +417,17 @@ axes[1, 0].set_ylabel('Predicted Salary')
 axes[1, 0].set_title(f'Random Forest (R² = {r2:.3f})')
 axes[1, 0].grid(True, alpha=0.3)
 
-# Model comparison bar chart
-axes[1, 1].bar(['Linear', 'Polynomial', 'Random Forest'],
-               [lr_r2, poly_r2, r2],
-               color=['blue', 'green', 'orange'], alpha=0.7)
-axes[1, 1].set_ylabel('R² Score')
+# Model comparison bar chart using Seaborn
+model_names = ['Linear', 'Polynomial', 'Random Forest']
+r2_scores = [lr_r2, poly_r2, r2]
+colors = ['blue', 'green', 'orange']
+comparison_plot_df = pd.DataFrame({
+    'Model': model_names,
+    'R²': r2_scores
+})
+
+sns.barplot(data=comparison_plot_df, x='R²', y='Model', palette=colors, ax=axes[1, 1])
+axes[1, 1].set_xlabel('R² Score')
 axes[1, 1].set_title('Model Performance Comparison (R²)')
 axes[1, 1].grid(True, alpha=0.3)
 

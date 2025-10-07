@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul class="collapse">
   <li><a href="#feature-engineering" id="toc-feature-engineering" class="nav-link active" data-scroll-target="#feature-engineering"><span class="header-section-number">1</span> Feature Engineering</a></li>
-  <li><a href="#linear-regression-model" id="toc-linear-regression-model" class="nav-link" data-scroll-target="#linear-regression-model"><span class="header-section-number">2</span> Linear Regression model</a></li>
+  <li><a href="#generalized-linear-regression-model" id="toc-generalized-linear-regression-model" class="nav-link" data-scroll-target="#generalized-linear-regression-model"><span class="header-section-number">2</span> Generalized Linear Regression model</a></li>
   <li><a href="#polynomial-regression-model" id="toc-polynomial-regression-model" class="nav-link" data-scroll-target="#polynomial-regression-model"><span class="header-section-number">3</span> Polynomial Regression model</a></li>
   <li><a href="#random-forest-regression" id="toc-random-forest-regression" class="nav-link" data-scroll-target="#random-forest-regression"><span class="header-section-number">4</span> Random Forest Regression</a></li>
   <li><a href="#model-comparison" id="toc-model-comparison" class="nav-link" data-scroll-target="#model-comparison"><span class="header-section-number">5</span> Model Comparison</a></li>
@@ -126,7 +126,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">October 6, 2025</p>
+      <p class="date-modified">October 7, 2025</p>
     </div>
   </div>
     
@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="f165e283" class="cell" data-execution_count="1">
+<div id="e3a53b25" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.sql <span class="im">import</span> SparkSession</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
@@ -162,17 +162,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting default log level to "WARN".
 To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
-25/10/06 04:24:03 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+25/10/07 04:55:00 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 [Stage 1:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
 </div>
 </div>
 <section id="feature-engineering" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="feature-engineering"><span class="header-section-number">1</span> Feature Engineering</h2>
-<div id="f4e4c9ce" class="cell" data-execution_count="2">
+<div id="6d5be54f" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.sql.functions <span class="im">import</span> col, <span class="bu">pow</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.feature <span class="im">import</span> StringIndexer, OneHotEncoder, VectorAssembler</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml <span class="im">import</span> Pipeline</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> LinearRegression</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> GeneralizedLinearRegression</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop missing values</span></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>key_features <span class="op">=</span> [</span>
@@ -200,21 +200,22 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Train-test split (80/20)</span></span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>train_df, test_df <span class="op">=</span> df_transformed.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Create polynomial feature ( by squaring MIN_YEARS_EXPERIENCE)</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>df_poly <span class="op">=</span> df_transformed.withColumn(</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">"MIN_YEARS_EXPERIENCE_SQ"</span>, <span class="bu">pow</span>(col(<span class="st">"MIN_YEARS_EXPERIENCE"</span>), <span class="dv">2</span>)</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Assemble polynomial features into new vector</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>poly_assembler <span class="op">=</span> VectorAssembler(</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    inputCols<span class="op">=</span>[<span class="st">"features"</span>, <span class="st">"MIN_YEARS_EXPERIENCE_SQ"</span>],</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    outputCol<span class="op">=</span><span class="st">"features_poly"</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> poly_assembler.transform(df_poly) <span class="co"># final structure</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>df_final.show(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co"># 80% for training and 20% for testing to ensure enough data for model training and validation.</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Create polynomial feature ( by squaring MIN_YEARS_EXPERIENCE)</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>df_poly <span class="op">=</span> df_transformed.withColumn(</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="st">"MIN_YEARS_EXPERIENCE_SQ"</span>, <span class="bu">pow</span>(col(<span class="st">"MIN_YEARS_EXPERIENCE"</span>), <span class="dv">2</span>)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Assemble polynomial features into new vector</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>poly_assembler <span class="op">=</span> VectorAssembler(</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    inputCols<span class="op">=</span>[<span class="st">"features"</span>, <span class="st">"MIN_YEARS_EXPERIENCE_SQ"</span>],</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    outputCol<span class="op">=</span><span class="st">"features_poly"</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> poly_assembler.transform(df_poly) <span class="co"># final structure</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>df_final.show(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 2:&gt;                                                          (0 + 1) / 1]                                                                                [Stage 5:&gt;                                                          (0 + 1) / 1]                                                                                25/10/06 04:24:36 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+<pre><code>[Stage 2:&gt;                                                          (0 + 1) / 1]                                                                                [Stage 5:&gt;                                                          (0 + 1) / 1]                                                                                25/10/07 04:55:33 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
 [Stage 8:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -232,89 +233,106 @@ only showing top 5 rows
 </div>
 </div>
 </section>
-<section id="linear-regression-model" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="linear-regression-model"><span class="header-section-number">2</span> Linear Regression model</h2>
-<div id="f4213094" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> LinearRegression(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features"</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    predictionCol<span class="op">=</span><span class="st">"prediction"</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    solver<span class="op">=</span><span class="st">"normal"</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    regParam<span class="op">=</span><span class="fl">0.1</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    elasticNetParam<span class="op">=</span><span class="fl">0.0</span></span>
+<section id="generalized-linear-regression-model" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="generalized-linear-regression-model"><span class="header-section-number">2</span> Generalized Linear Regression model</h2>
+<div id="19761e6c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> GeneralizedLinearRegression(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    family<span class="op">=</span><span class="st">"gaussian"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    link<span class="op">=</span><span class="st">"identity"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    maxIter<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    regParam<span class="op">=</span><span class="fl">0.3</span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>lr_model <span class="op">=</span> lr.fit(train_df)</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>test_results <span class="op">=</span> lr_model.evaluate(test_df)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficients:"</span>, lr_model.coefficients)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Intercept:"</span>, lr_model.intercept)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, test_results.r2)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, test_results.rootMeanSquaredError)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, test_results.meanAbsoluteError)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficient statistics</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>training_summary <span class="op">=</span> lr_model.summary</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    coefs <span class="op">=</span> lr_model.coefficients.toArray().tolist()</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> training_summary.coefficientStandardErrors</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    tvals <span class="op">=</span> training_summary.tValues</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    pvals <span class="op">=</span> training_summary.pValues</span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    coef_df <span class="op">=</span> spark.createDataFrame(</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>        [</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>            (<span class="bu">float</span>(coefs[i]), <span class="bu">float</span>(se[i]), <span class="bu">float</span>(tvals[i]), <span class="bu">float</span>(pvals[i]),</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>             <span class="bu">float</span>(coefs[i] <span class="op">-</span> <span class="fl">1.96</span><span class="op">*</span>se[i]), <span class="bu">float</span>(coefs[i] <span class="op">+</span> <span class="fl">1.96</span><span class="op">*</span>se[i]))</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(coefs))</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>        ],</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"Coefficient"</span>, <span class="st">"StdError"</span>, <span class="st">"tValue"</span>, <span class="st">"pValue"</span>, <span class="st">"CI_lower"</span>, <span class="st">"CI_upper"</span>]</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    coef_df.show(truncate<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>lr_predictions <span class="op">=</span> lr_model.transform(test_df)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>evaluator <span class="op">=</span> RegressionEvaluator(labelCol<span class="op">=</span><span class="st">"SALARY"</span>, predictionCol<span class="op">=</span><span class="st">"prediction"</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficients:"</span>, lr_model.coefficients)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Intercept:"</span>, lr_model.intercept)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(lr_predictions))</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(lr_predictions))</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(lr_predictions))</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficient statistics</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>training_summary <span class="op">=</span> lr_model.summary</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    coefs <span class="op">=</span> lr_model.coefficients.toArray().tolist()</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> training_summary.coefficientStandardErrors</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    tvals <span class="op">=</span> training_summary.tValues</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    pvals <span class="op">=</span> training_summary.pValues</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    coef_df <span class="op">=</span> spark.createDataFrame(</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>            (<span class="bu">float</span>(coefs[i]), <span class="bu">float</span>(se[i]), <span class="bu">float</span>(tvals[i]), <span class="bu">float</span>(pvals[i]),</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>             <span class="bu">float</span>(coefs[i] <span class="op">-</span> <span class="fl">1.96</span><span class="op">*</span>se[i]), <span class="bu">float</span>(coefs[i] <span class="op">+</span> <span class="fl">1.96</span><span class="op">*</span>se[i]))</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(coefs))</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"Coefficient"</span>, <span class="st">"StdError"</span>, <span class="st">"tValue"</span>, <span class="st">"pValue"</span>, <span class="st">"CI_lower"</span>, <span class="st">"CI_upper"</span>]</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="co"># df_final.printSchema()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    coef_df.show(truncate<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co"># df_final.printSchema()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 9:&gt;                                                          (0 + 1) / 1]                                                                                [Stage 10:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 11:&gt;                                                         (0 + 1) / 1][Stage 11:==========================================================(1 + 0) / 1]                                                                                </code></pre>
+<pre><code>[Stage 9:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Coefficients: [0.1056733212355078,0.48977543025224973,0.503139353389252,5.7896988428883205,-63.121060570851036,-37.26526125220093,240.24666741940518,48.29769941270994,152.97224542170875,-176.76685478040588,85.32700404094581,434.3029205600845,-161.42180238845438,-15.658138779044311,-118.88733287867038,-161.488511061751,-102.29570157562766,202.43989548523422,-141.28941436132638,-10.325815963089955,46.185975728901596,-139.75996142074044,-91.80251651960592,756.3190933906901,88.86339651280153,-194.06124408107652,92.43407969352187,-238.67266875170853,-232.8820337791898,49.6562182765161,-169.17214386622157,-145.49138926623516,-121.94664902474601,-99.67817693238612,-159.8369696274722,-201.90891440755803,-187.97078587552411,-97.418030296233,-200.9129401668866,-193.20805472704532,-224.3286954981128,50.53920843405091,42.188095677992145,-80.6658098666956,-132.28870308771403,-134.87061703977412,-191.26165535386377,-161.9231024738066,147.51210616901244,344.7174935998752,172.6174881958673,-142.22977108132568,-192.08015952403858,-86.73731887801574,-139.93362440316614,-118.82796675173627,374.35818942153884,-225.96099712459866]
-Intercept: 771.1641000165035
-R²: 0.9991007614002311
-RMSE: 1269.8325633202555
-MAE: 439.36970680641974</code></pre>
+<pre><code>Coefficients: [0.10577257338987292,0.4897760646675632,0.5031355811149286,5.821447063989891,-63.13234211764908,-37.24918495447914,240.2496005871974,48.31465068112287,152.96207700756838,-176.77153212602502,85.33910314560474,434.28702577440487,-161.42079058360767,-15.678039153034717,-118.88023960359375,-161.45114829498186,-102.29690138402427,202.46320733110622,-141.30430068749794,-10.336921084699812,46.18232664748482,-139.7522513504501,-91.77765784576877,756.3227801189014,88.81214010053442,-194.06691355630176,92.42948084492659,-238.66548174672735,-232.9013492626481,49.64728458137663,-169.13719812248235,-145.48484292668024,-121.95157094464349,-99.6819901995056,-159.90690621771986,-201.88892491962216,-187.93226914248663,-97.41512683302918,-200.87692671645,-193.2008460392148,-224.35294989361188,50.530082652301964,42.19504489586543,-80.67373549847771,-132.2894187558734,-134.85646865840482,-191.28731365448144,-161.90766503071904,147.48514217917366,344.69364885521287,172.6083494391896,-142.18206008275982,-192.08893673890222,-86.81171897251811,-139.9320627067798,-118.84967713486162,374.329274291932,-226.00705073681388]
+Intercept: 771.471741322882</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[Stage 10:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R²: 0.9991007618414153</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[Stage 11:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RMSE: 1269.8322518177556</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>[Stage 12:&gt;                                                         (0 + 1) / 1]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>+-------------------+---------------------+----------------------+------------------+-------------------+------------------+
-|Coefficient        |StdError             |tValue                |pValue            |CI_lower           |CI_upper          |
-+-------------------+---------------------+----------------------+------------------+-------------------+------------------+
-|0.1056733212355078 |0.8210832031994537   |0.1286998940226014    |0.8975973610758383|-1.5036497570354215|1.7149963995064372|
-|0.48977543025224973|4.7249959042083763E-4|1036.5626556755851    |0.0               |0.48884933105502487|0.4907015294494746|
-|0.503139353389252  |3.462410613495604E-4 |1453.1475597612298    |0.0               |0.5024607209090068 |0.5038179858694971|
-|5.7896988428883205 |4.284486456446695    |1.351316873502259     |0.1766204275237364|-2.607894611747202 |14.187292297523843|
-|-63.121060570851036|27298.101562665237   |-0.0023122875569186008|0.9981551029906375|-53567.40012339471 |53441.15800225302 |
-|-37.26526125220093 |27298.135474827668   |-0.0013651211192267768|0.998910814588849 |-53541.61079191443 |53467.08026941003 |
-|240.24666741940518 |27298.21724174279    |0.008800818943298408  |0.9929782051687752|-53264.25912639646 |53744.75246123527 |
-|48.29769941270994  |7794.939059800116    |0.00619603296987782   |0.9950564196210856|-15229.782857795519|15326.378256620937|
-|152.97224542170875 |7794.961428286759    |0.019624503190816975  |0.9843432559869401|-15125.15215402034 |15431.096644863756|
-|-176.76685478040588|7795.039070477479    |-0.022676840126418785 |0.9819084418952908|-15455.043432916265|15101.509723355453|
-|85.32700404094581  |7795.0383399352695   |0.010946322560570544  |0.9912664617871387|-15192.948142232182|15363.602150314075|
-|434.3029205600845  |7795.067781062647    |0.05571509225553893   |0.9555697404120511|-14844.029930322702|15712.635771442872|
-|-161.42180238845438|7795.118691810467    |-0.020708062156647306 |0.9834788956017513|-15439.85443833697 |15117.01083356006 |
-|-15.658138779044311|7795.145305182537    |-0.0020087039004435397|0.9983973219369222|-15294.142936936818|15262.826659378728|
-|-118.88733287867038|7795.139017294163    |-0.015251470514497427 |0.9878318224022282|-15397.35980677523 |15159.58514101789 |
-|-161.488511061751  |7795.162958459379    |-0.020716502262021638 |0.9834721629412668|-15440.007909642134|15117.030887518633|
-|-102.29570157562766|7795.17058499679     |-0.013122958690925142 |0.9895299211268678|-15380.830048169337|15176.238645018082|
-|202.43989548523422 |7795.18457941169     |0.02596986555262718   |0.9792818229786517|-15076.121880161676|15481.001671132146|
-|-141.28941436132638|7795.199917963428    |-0.01812518163077973  |0.9855393024458872|-15419.881253569645|15137.302424846992|
-|-10.325815963089955|7795.1911449965155   |-0.0013246392257767491|0.9989431135982323|-15288.90046015626 |15268.24882823008 |
-+-------------------+---------------------+----------------------+------------------+-------------------+------------------+
+<pre><code>MAE: 439.38359836620407</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>                                                                                [Stage 13:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 16:&gt;                                                         (0 + 1) / 1]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>+-------------------+---------------------+----------------------+-------------------+-------------------+------------------+
+|Coefficient        |StdError             |tValue                |pValue             |CI_lower           |CI_upper          |
++-------------------+---------------------+----------------------+-------------------+-------------------+------------------+
+|0.10577257338987292|0.8210812224588767   |0.12882108431747807   |0.8975014656141185 |-1.5035466226295255|1.7150917694092713|
+|0.4897760646675632 |4.7249581342235624E-4|1036.5722843553756    |0.0                |0.4888499728732554 |0.490702156461871 |
+|0.5031355811149286 |3.462378911127178E-4 |1453.149970091323     |0.0                |0.5024569548483477 |0.5038142073815095|
+|5.821447063989891  |4.284466788662476    |1.358733151904587     |0.17425770783310224|-2.576107841788562 |14.219001969768343|
+|-63.13234211764908 |15760.586188378582   |-0.004005710280256017 |0.9968039833938374 |-30953.88127133967 |30827.61658710437 |
+|-37.24918495447914 |15760.644925545      |-0.0023634302486001263|0.9981142982265387 |-30928.113239022678|30853.61486911372 |
+|240.2496005871974  |15760.786548337737   |0.015243503225575763  |0.9878381785111885 |-30650.892034154767|31131.391235329163|
+|48.31465068112287  |4500.489171196371    |0.010735422049305658  |0.9914347225454412 |-8772.644124863764 |8869.27342622601  |
+|152.96207700756838 |4500.527913588752    |0.03398758544430299   |0.9728876379345217 |-8668.072633626385 |8973.996787641523 |
+|-176.77153212602502|4500.662388715528    |-0.03927678125096491  |0.9686703973498092 |-8998.06981400846  |8644.52674975641  |
+|85.33910314560474  |4500.661123424321    |0.01896145939569754   |0.9848721785122763 |-8735.956698766064 |8906.634905057273 |
+|434.28702577440487 |4500.712114327836    |0.09649295816807957   |0.923130741260461  |-8387.108718308154 |9255.682769856965 |
+|-161.42079058360767|4500.800288897419    |-0.035864908510115576 |0.9713906968532522 |-8982.989356822549 |8660.147775655332 |
+|-15.678039153034717|4500.846381301049    |-0.003483353535052823 |0.9972207517613536 |-8837.336946503092 |8805.98086819702  |
+|-118.88023960359375|4500.835491139143    |-0.026412927074903073 |0.9789284399252751 |-8940.517802236314 |8702.757323029127 |
+|-161.45114829498186|4500.876955298087    |-0.03587104244316965  |0.9713858059543845 |-8983.169980679231 |8660.267684089267 |
+|-102.29690138402427|4500.890163796606    |-0.022728148801954864 |0.9818675149292697 |-8924.041622425373 |8719.447819657324 |
+|202.46320733110622 |4500.914400805749    |0.04498268336204338   |0.964121889624981  |-8619.329018248163 |9024.255432910375 |
+|-141.30430068749794|4500.940965632624    |-0.03139439103210657  |0.974955556934114  |-8963.148593327442 |8680.539991952446 |
+|-10.336921084699812|4500.925771743812    |-0.002296621097284823 |0.9981676026572368 |-8832.151433702571 |8811.477591533172 |
++-------------------+---------------------+----------------------+-------------------+-------------------+------------------+
 only showing top 20 rows
 </code></pre>
 </div>
@@ -325,91 +343,112 @@ only showing top 20 rows
 </section>
 <section id="polynomial-regression-model" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="polynomial-regression-model"><span class="header-section-number">3</span> Polynomial Regression model</h2>
-<div id="d090f1ae" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> LinearRegression</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># train/test</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>train_poly, test_poly <span class="op">=</span> df_final.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Regression model using polynomial features</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>lr_poly <span class="op">=</span> LinearRegression(</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features_poly"</span>,</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    predictionCol<span class="op">=</span><span class="st">"prediction"</span>,</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    solver<span class="op">=</span><span class="st">"normal"</span>,</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    regParam<span class="op">=</span><span class="fl">0.1</span>,</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    elasticNetParam<span class="op">=</span><span class="fl">0.0</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">#  Fit model on training data</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>lr_poly_model <span class="op">=</span> lr_poly.fit(train_poly)</span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="co">#  Evaluate on test data</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>test_poly_results <span class="op">=</span> lr_poly_model.evaluate(test_poly)</span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Polynomial Regression Results"</span>)</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficients:"</span>, lr_poly_model.coefficients)</span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Intercept:"</span>, lr_poly_model.intercept)</span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, test_poly_results.r2)</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, test_poly_results.rootMeanSquaredError)</span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, test_poly_results.meanAbsoluteError)</span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficient statistics</span></span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>poly_summary <span class="op">=</span> lr_poly_model.summary</span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    coefs <span class="op">=</span> lr_poly_model.coefficients.toArray().tolist()</span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> poly_summary.coefficientStandardErrors</span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>    tvals <span class="op">=</span> poly_summary.tValues</span>
-<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>    pvals <span class="op">=</span> poly_summary.pValues</span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>    coef_poly_df <span class="op">=</span> spark.createDataFrame(</span>
-<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>        [</span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>            (<span class="bu">float</span>(coefs[i]), <span class="bu">float</span>(se[i]), <span class="bu">float</span>(tvals[i]), <span class="bu">float</span>(pvals[i]),</span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>             <span class="bu">float</span>(coefs[i] <span class="op">-</span> <span class="fl">1.96</span><span class="op">*</span>se[i]), <span class="bu">float</span>(coefs[i] <span class="op">+</span> <span class="fl">1.96</span><span class="op">*</span>se[i]))</span>
-<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(coefs))</span>
-<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>        ],</span>
-<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"Coefficient"</span>, <span class="st">"StdError"</span>, <span class="st">"tValue"</span>, <span class="st">"pValue"</span>, <span class="st">"CI_lower"</span>, <span class="st">"CI_upper"</span>]</span>
-<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>    coef_poly_df.show(truncate<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="dd6f7a70" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> GeneralizedLinearRegression</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># train/test</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>train_poly, test_poly <span class="op">=</span> df_final.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Regression model using polynomial features</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>lr_poly <span class="op">=</span> GeneralizedLinearRegression(</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    family<span class="op">=</span><span class="st">"gaussian"</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    link<span class="op">=</span><span class="st">"identity"</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features_poly"</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    maxIter<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    regParam<span class="op">=</span><span class="fl">0.3</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">#  Fit model on training data</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>lr_poly_model <span class="op">=</span> lr_poly.fit(train_poly)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>poly_predictions <span class="op">=</span> lr_poly_model.transform(test_poly)</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>evaluator <span class="op">=</span> RegressionEvaluator(labelCol<span class="op">=</span><span class="st">"SALARY"</span>, predictionCol<span class="op">=</span><span class="st">"prediction"</span>)</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Polynomial Regression Results"</span>)</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficients:"</span>, lr_poly_model.coefficients)</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Intercept:"</span>, lr_poly_model.intercept)</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(poly_predictions))</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(poly_predictions))</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(poly_predictions))</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficient statistics</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>poly_summary <span class="op">=</span> lr_poly_model.summary</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    coefs <span class="op">=</span> lr_poly_model.coefficients.toArray().tolist()</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> poly_summary.coefficientStandardErrors</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    tvals <span class="op">=</span> poly_summary.tValues</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>    pvals <span class="op">=</span> poly_summary.pValues</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>    coef_poly_df <span class="op">=</span> spark.createDataFrame(</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>            (<span class="bu">float</span>(coefs[i]), <span class="bu">float</span>(se[i]), <span class="bu">float</span>(tvals[i]), <span class="bu">float</span>(pvals[i]),</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>             <span class="bu">float</span>(coefs[i] <span class="op">-</span> <span class="fl">1.96</span><span class="op">*</span>se[i]), <span class="bu">float</span>(coefs[i] <span class="op">+</span> <span class="fl">1.96</span><span class="op">*</span>se[i]))</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(coefs))</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"Coefficient"</span>, <span class="st">"StdError"</span>, <span class="st">"tValue"</span>, <span class="st">"pValue"</span>, <span class="st">"CI_lower"</span>, <span class="st">"CI_upper"</span>]</span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>    coef_poly_df.show(truncate<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 13:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 14:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 15:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 17:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Polynomial Regression Results
-Coefficients: [0.10854770089141298,0.48984411408256695,0.503136780804795,-7.344653006968833,-61.59272368642246,-36.43971159667926,234.56736460177743,47.64703447239302,153.3194084826507,-176.24290063001493,83.92788853279384,434.08737664367186,-161.9796813002461,-15.349969251994995,-119.38655874008751,-161.98261272919777,-102.06970741083396,201.43081215160137,-140.20153585528993,-9.168554144114431,45.46784752825136,-139.60222721207862,-90.98578070354411,755.7953588557543,91.30799923733025,-192.3658196740873,92.0718170666282,-238.83504110065346,-232.77774666911668,46.99414632756935,-168.5549253468413,-145.86812928945875,-122.64787501814395,-97.9443235319071,-155.71440488577022,-202.72360067656857,-187.7691433456354,-98.10135897036282,-200.80405684017367,-192.61970989273877,-224.51439871819966,52.63021388310491,43.97418041746692,-81.21810961348508,-131.62408028941158,-134.85150475072797,-191.47437489059595,-162.89295582976834,146.1730373000824,341.35610225292316,171.75203274523346,-142.87936888966553,-195.21535704639842,-85.059891170205,-139.2805233998004,-118.75371134315505,376.7041443322435,-225.59964862316903,0.9629917928005545]
-Intercept: 795.661563599274
-R²: 0.9991016327384634
-RMSE: 1269.2171972637161
-MAE: 438.80034283748387
-+-------------------+---------------------+----------------------+------------------+-------------------+------------------+
-|Coefficient        |StdError             |tValue                |pValue            |CI_lower           |CI_upper          |
-+-------------------+---------------------+----------------------+------------------+-------------------+------------------+
-|0.10854770089141298|0.8210854419774553   |0.13220025023217183   |0.8948282071932361|-1.5007797653843993|1.7178751671672254|
-|0.48984411408256695|4.7714924289268845E-4|1026.6056613920555    |0.0               |0.4889089015664973 |0.4907793265986366|
-|0.503136780804795  |3.4624896715124674E-4|1453.106950597826     |0.0               |0.5024581328291785 |0.5038154287804114|
-|-7.344653006968833 |13.411780528013258   |-0.547626990437848    |0.5839586401554981|-33.63174284187482 |18.94243682793715 |
-|-61.59272368642246 |27298.01941935204    |-0.002256307417041337 |0.9981997676209573|-53565.71078561642 |53442.52533824358 |
-|-36.43971159667926 |27298.053303041717   |-0.0013348831578630892|0.9989349405710852|-53540.624185558445|53467.74476236509 |
-|234.56736460177743 |27298.13561115251    |0.008592797982362801  |0.993144171989772 |-53269.77843325714 |53738.91316246069 |
-|47.64703447239302  |7794.915618777078    |0.006112578609268926  |0.9951230038462162|-15230.38757833068 |15325.681647275465|
-|153.3194084826507  |7794.937969008851    |0.019669099240073325  |0.9843076811675557|-15124.759010774696|15431.397827739997|
-|-176.24290063001493|7795.015620214871    |-0.022609691784704438 |0.9819620036518844|-15454.473516251162|15101.987714991132|
-|83.92788853279384  |7795.014990748926    |0.010766866854316371  |0.9914096351865449|-15194.3014933351  |15362.157270400687|
-|434.08737664367186 |7795.044317016309    |0.05568760856125914   |0.9555916348385651|-14844.199484708293|15712.374237995638|
-|-161.9796813002461 |7795.095243511681    |-0.020779692388630068 |0.9834217565056091|-15440.36635858314 |15116.406995982647|
-|-15.349969251994995|7795.121843816246    |-0.0019691763078946477|0.9984288594870692|-15293.788783131837|15263.088844627848|
-|-119.38655874008751|7795.1155652105645   |-0.015315559819652602 |0.9877806936818301|-15397.813066552793|15159.03994907262 |
-|-161.98261272919777|7795.139505997982    |-0.020779950455608907 |0.9834215506544441|-15440.456044485243|15116.490819026847|
-|-102.06970741083396|7795.1471209182055   |-0.013094006543754746 |0.9895530191390636|-15380.558064410516|15176.418649588848|
-|201.43081215160137 |7795.161173374564    |0.025840493566652065  |0.979385010064783 |-15077.085087662545|15479.946711965746|
-|-140.20153585528993|7795.176521803766    |-0.017985678125842872 |0.9856505896130634|-15418.747518590673|15138.344446880092|
-|-9.168554144114431 |7795.1677582185      |-0.0011761843270721095|0.9990615614459544|-15287.697360252376|15269.360251964146|
-+-------------------+---------------------+----------------------+------------------+-------------------+------------------+
+Coefficients: [0.10864189686946173,0.4898446498795814,0.5031330094998685,-7.294074629446415,-61.606183030030984,-36.42477835447172,234.5785726337609,47.66495235497268,153.30872148381684,-176.2483283327536,83.9420652739141,434.07175893403144,-161.97789924707783,-15.370297973052363,-119.3787727802767,-161.94452829454534,-102.0712038173867,201.45561915371567,-140.2180176255666,-9.181294490038646,45.46520302014749,-139.59475217986548,-90.96205773513772,755.7997862985653,91.25321470444824,-192.37388895594734,92.06768904691285,-238.82762343754223,-232.79724289167783,46.988988491411725,-168.5208658938645,-145.86104897935874,-122.65183729247258,-97.95064001860672,-155.79027411246554,-202.70247726846625,-187.7309421134543,-98.09748718742412,-200.76815604456365,-192.61329916789478,-224.5383725545915,52.618094862437424,43.978613627274086,-81.22525014807809,-131.6257250593234,-134.83735400335175,-191.49970597043983,-162.87607913749576,146.14802544190084,341.3370623433174,171.74420670609214,-142.83066925953963,-195.21965382722956,-85.13674407585455,-139.27991520093798,-118.77551011346809,376.6718850326892,-225.64627278434565,0.9616178547957062]
+Intercept: 795.9342167087742</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[Stage 18:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R²: 0.9991016319916092</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[Stage 19:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RMSE: 1269.2177248430587</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[Stage 20:&gt;                                                         (0 + 1) / 1]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>MAE: 438.815563380054</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>                                                                                [Stage 21:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>+-------------------+---------------------+----------------------+------------------+-------------------+-------------------+
+|Coefficient        |StdError             |tValue                |pValue            |CI_lower           |CI_upper           |
++-------------------+---------------------+----------------------+------------------+-------------------+-------------------+
+|0.10864189686946173|0.8210834577114463   |0.13231529127656813   |0.8947372190517244|-1.500681680244973 |1.7179654739838965 |
+|0.4898446498795814 |4.7714484248743565E-4|1026.6162520502987    |0.0               |0.488909445988306  |0.49077985377085676|
+|0.5031330094998685 |3.4624581479118603E-4|1453.1092882763016    |0.0               |0.5024543677028778 |0.5038116512968592 |
+|-7.294074629446415 |13.410941333060745   |-0.543889832063094    |0.5865277899146577|-33.57951964224547 |18.991370383352645 |
+|-61.606183030030984|15760.538813755664   |-0.0039088881261002085|0.996881234114777 |-30952.262257991133|30829.04989193107  |
+|-36.42477835447172 |15760.597501615233   |-0.0023111292798854047|0.9981560271332635|-30927.19588152033 |30854.346324811388 |
+|234.5785726337609  |15760.740061617484   |0.0148837282841201    |0.9881251986163893|-30656.471948136506|31125.629093404026 |
+|47.66495235497268  |4500.475667629807    |0.010591092114508779  |0.9915498721391205|-8773.267356199447 |8868.597260909393  |
+|153.30872148381684 |4500.51437841101     |0.03406471096264897   |0.9728261376737084|-8667.699460201762 |8974.316903169394  |
+|-176.2483283327536 |4500.648869151094    |-0.03916064848800287  |0.9687629846908643|-8997.520111868896 |8645.02345520339   |
+|83.9420652739141   |4500.647778877783    |0.018651107440103808  |0.9851197544098045|-8737.32758132654  |8905.211711874368  |
+|434.07175893403144 |4500.6985708954635   |0.09644541888253318   |0.9231684953558019|-8387.297440021077 |9255.44095788914   |
+|-161.97789924707783|4500.786772737273    |-0.03598879649847679  |0.9712919145273127|-8983.519973812134 |8659.564175317977  |
+|-15.370297973052363|4500.832842508601    |-0.0034149897387625522|0.9972752967985401|-8837.00266928991  |8806.262073343807  |
+|-119.3787727802767 |4500.821968423608    |-0.026523771350611444 |0.978840031946246 |-8940.989830890549 |8702.232285329994  |
+|-161.94452829454534|4500.863431924387    |-0.03598076918883637  |0.9712983151072367|-8983.636854866345 |8659.747798277254  |
+|-102.0712038173867 |4500.876620307754    |-0.0226780719464395   |0.9819074593485553|-8923.789379620584 |8719.646971985812  |
+|201.45561915371567 |4500.900957815064    |0.04475895404983786   |0.9643002163572982|-8620.31025816381  |9023.221496471242  |
+|-140.2180176255666 |4500.927539746499    |-0.031153138189259532 |0.9751479506306358|-8962.035995528704 |8681.599960277572  |
+|-9.181294490038646 |4500.9123621176905   |-0.0020398740858217517|0.9983724523724109|-8830.969524240712 |8812.606935260634  |
++-------------------+---------------------+----------------------+------------------+-------------------+-------------------+
 only showing top 20 rows
 </code></pre>
 </div>
@@ -417,47 +456,47 @@ only showing top 20 rows
 </section>
 <section id="random-forest-regression" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="random-forest-regression"><span class="header-section-number">4</span> Random Forest Regression</h2>
-<div id="c377abe7" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> RandomForestRegressor</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Train-test split</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>train_rf, test_rf <span class="op">=</span> df_transformed.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest Regression</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RandomForestRegressor(</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features"</span>,</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    numTrees<span class="op">=</span><span class="dv">200</span>,</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    maxDepth<span class="op">=</span><span class="dv">6</span>,</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="dv">42</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Model</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>rf_model <span class="op">=</span> rf.fit(train_rf)</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluation</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>rf_predictions <span class="op">=</span> rf_model.transform(test_rf)</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>evaluator <span class="op">=</span> RegressionEvaluator(labelCol<span class="op">=</span><span class="st">"SALARY"</span>, predictionCol<span class="op">=</span><span class="st">"prediction"</span>)</span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>r2 <span class="op">=</span> evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(rf_predictions)</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(rf_predictions)</span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>mae <span class="op">=</span> evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(rf_predictions)</span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Random Forest Results"</span>)</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, r2)</span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, rmse)</span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, mae)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="1555d793" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> RandomForestRegressor</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Train-test split</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>train_rf, test_rf <span class="op">=</span> df_transformed.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest Regression</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>rf <span class="op">=</span> RandomForestRegressor(</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features"</span>,</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    numTrees<span class="op">=</span><span class="dv">200</span>,</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    maxDepth<span class="op">=</span><span class="dv">6</span>,</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Model</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>rf_model <span class="op">=</span> rf.fit(train_rf)</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluation</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>rf_predictions <span class="op">=</span> rf_model.transform(test_rf)</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>evaluator <span class="op">=</span> RegressionEvaluator(labelCol<span class="op">=</span><span class="st">"SALARY"</span>, predictionCol<span class="op">=</span><span class="st">"prediction"</span>)</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>r2 <span class="op">=</span> evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(rf_predictions)</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(rf_predictions)</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>mae <span class="op">=</span> evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(rf_predictions)</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Random Forest Results"</span>)</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, r2)</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, rmse)</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, mae)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 17:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 18:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 19:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 21:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 23:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 25:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 27:&gt;                                                         (0 + 1) / 1]                                                                                25/10/06 04:26:40 WARN DAGScheduler: Broadcasting large task binary with size 1244.7 KiB
-[Stage 29:&gt;                                                         (0 + 1) / 1]                                                                                25/10/06 04:26:44 WARN DAGScheduler: Broadcasting large task binary with size 2.2 MiB
-[Stage 31:&gt;                                                         (0 + 1) / 1][Stage 32:&gt;                                                         (0 + 1) / 1]                                                                                WARNING: An illegal reflective access operation has occurred
+<pre><code>[Stage 25:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 26:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 27:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 29:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 31:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 33:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 35:&gt;                                                         (0 + 1) / 1]                                                                                25/10/07 04:58:23 WARN DAGScheduler: Broadcasting large task binary with size 1244.7 KiB
+[Stage 37:&gt;                                                         (0 + 1) / 1][Stage 38:&gt;                                                         (0 + 1) / 1]                                                                                25/10/07 04:58:27 WARN DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+[Stage 39:&gt;                                                         (0 + 1) / 1][Stage 40:&gt;                                                         (0 + 1) / 1]                                                                                WARNING: An illegal reflective access operation has occurred
 WARNING: Illegal reflective access by org.apache.spark.util.SizeEstimator$ (file:/opt/spark-3.5.6-bin-hadoop3/jars/spark-core_2.12-3.5.6.jar) to field java.nio.charset.Charset.name
 WARNING: Please consider reporting this to the maintainers of org.apache.spark.util.SizeEstimator$
 WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
 WARNING: All illegal access operations will be denied in a future release
-[Stage 33:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 34:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 35:&gt;                                                         (0 + 1) / 1]</code></pre>
+[Stage 41:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 42:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 43:&gt;                                                         (0 + 1) / 1]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Random Forest Results
@@ -471,43 +510,42 @@ MAE: 4380.591032239985</code></pre>
 </div>
 <section id="feature-importance-plot" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="feature-importance-plot"><span class="header-section-number">4.1</span> Feature Importance Plot</h3>
-<div id="1aceed7c" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># OHE vector size</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>ohe_sizes <span class="op">=</span> {c<span class="op">+</span><span class="st">"_OHE"</span>: df_transformed.select(c<span class="op">+</span><span class="st">"_OHE"</span>).head()[<span class="dv">0</span>].size <span class="cf">for</span> c <span class="kw">in</span> cat_cols}</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Expanded feature names</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>expanded_feature_names <span class="op">=</span> []</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> cont_cols:</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    expanded_feature_names.append(col)</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> c <span class="kw">in</span> cat_cols:</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(ohe_sizes[c<span class="op">+</span><span class="st">"_OHE"</span>]):</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>        expanded_feature_names.append(<span class="ss">f"</span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Now expanded_feature_names should match the length of rf_model.featureImportances</span></span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>importances <span class="op">=</span> rf_model.featureImportances.toArray()</span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>feat_imp <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"feature"</span>: expanded_feature_names,</span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"importance"</span>: importances</span>
-<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Top 10 plot</span></span>
-<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>top10 <span class="op">=</span> feat_imp.sort_values(<span class="st">"importance"</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>)</span>
-<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>sns.barplot(x<span class="op">=</span><span class="st">"importance"</span>, y<span class="op">=</span><span class="st">"feature"</span>, data<span class="op">=</span>top10, palette<span class="op">=</span><span class="st">"viridis"</span>)</span>
-<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Top 10 Feature Importances - Random Forest"</span>)</span>
-<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">"_output/rf_feature_importance.png"</span>)</span>
-<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e30df786" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co"># OHE vector size</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>ohe_sizes <span class="op">=</span> {c<span class="op">+</span><span class="st">"_OHE"</span>: df_transformed.select(c<span class="op">+</span><span class="st">"_OHE"</span>).head()[<span class="dv">0</span>].size <span class="cf">for</span> c <span class="kw">in</span> cat_cols}</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Expanded feature names</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>expanded_feature_names <span class="op">=</span> []</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> col <span class="kw">in</span> cont_cols:</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>    expanded_feature_names.append(col)</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> c <span class="kw">in</span> cat_cols:</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(ohe_sizes[c<span class="op">+</span><span class="st">"_OHE"</span>]):</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>        expanded_feature_names.append(<span class="ss">f"</span><span class="sc">{</span>c<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>importances <span class="op">=</span> rf_model.featureImportances.toArray()</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>feat_imp <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"feature"</span>: expanded_feature_names,</span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"importance"</span>: importances</span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Top 10 plot</span></span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>top10 <span class="op">=</span> feat_imp.sort_values(<span class="st">"importance"</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>)</span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a>sns.barplot(x<span class="op">=</span><span class="st">"importance"</span>, y<span class="op">=</span><span class="st">"feature"</span>, data<span class="op">=</span>top10, palette<span class="op">=</span><span class="st">"viridis"</span>)</span>
+<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Top 10 Feature Importances - Random Forest"</span>)</span>
+<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">"_output/rf_feature_importance.png"</span>)</span>
+<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a>plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/tmp/ipykernel_3150/1924440109.py:29: FutureWarning:
+<pre><code>/tmp/ipykernel_7983/192427344.py:28: FutureWarning:
 
 
 
@@ -527,99 +565,100 @@ Passing `palette` without assigning `hue` is deprecated and will be removed in v
 </section>
 <section id="model-comparison" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="model-comparison"><span class="header-section-number">5</span> Model Comparison</h2>
-<div id="21caca1b" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Predictions for all three models</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>lr_predictions <span class="op">=</span> lr_model.transform(test_df)</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>poly_predictions <span class="op">=</span> lr_poly_model.transform(test_poly)</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>rf_predictions <span class="op">=</span> rf_model.transform(test_rf)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Metrics calculation for all models</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>evaluator <span class="op">=</span> RegressionEvaluator(labelCol<span class="op">=</span><span class="st">"SALARY"</span>, predictionCol<span class="op">=</span><span class="st">"prediction"</span>)</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Regression metrics</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>lr_r2 <span class="op">=</span> evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(lr_predictions)</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>lr_rmse <span class="op">=</span> evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(lr_predictions)</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>lr_mae <span class="op">=</span> evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(lr_predictions)</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Get AIC for Linear Regression</span></span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    lr_aic <span class="op">=</span> lr_model.summary.aic</span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AttributeError</span>:</span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate AIC manually</span></span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    n_obs_lr <span class="op">=</span> lr_predictions.count()</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    k_lr <span class="op">=</span> <span class="bu">len</span>(lr_model.coefficients) <span class="op">+</span> <span class="dv">1</span>  <span class="co"># +1 for intercept</span></span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    lr_rmse_val <span class="op">=</span> lr_rmse</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># AIC = n * log(2π * MSE) + 2k</span></span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    lr_aic <span class="op">=</span> n_obs_lr <span class="op">*</span> np.log(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> lr_rmse_val<span class="op">**</span><span class="dv">2</span>) <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> k_lr</span>
-<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Polynomial Regression metrics</span></span>
-<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>poly_r2 <span class="op">=</span> evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(poly_predictions)</span>
-<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>poly_rmse <span class="op">=</span> evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(poly_predictions)</span>
-<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>poly_mae <span class="op">=</span> evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(poly_predictions)</span>
-<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a><span class="co"># AIC for Polynomial Regression</span></span>
-<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>    poly_aic <span class="op">=</span> lr_poly_model.summary.aic</span>
-<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">AttributeError</span>:</span>
-<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate AIC manually</span></span>
-<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>    n_obs_poly <span class="op">=</span> poly_predictions.count()</span>
-<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>    k_poly <span class="op">=</span> <span class="bu">len</span>(lr_poly_model.coefficients) <span class="op">+</span> <span class="dv">1</span>  <span class="co"># +1 for intercept</span></span>
-<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>    poly_rmse_val <span class="op">=</span> poly_rmse</span>
-<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># AIC = n * log(2π * MSE) + 2k</span></span>
-<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>    poly_aic <span class="op">=</span> n_obs_poly <span class="op">*</span> np.log(<span class="dv">2</span> <span class="op">*</span> np.pi <span class="op">*</span> poly_rmse_val<span class="op">**</span><span class="dv">2</span>) <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> k_poly</span>
-<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest metrics</span></span>
-<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>rf_aic <span class="op">=</span> <span class="va">None</span>  <span class="co"># AIC not directly available for Random Forest</span></span>
-<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a><span class="co"># BIC calculation for Linear and Polynomial models</span></span>
-<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate_bic(model_summary, n_obs):</span>
-<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Calculate BIC for PySpark Linear Regression models"""</span></span>
-<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>        k <span class="op">=</span> <span class="bu">len</span>(model_summary.coefficientStandardErrors) <span class="op">+</span> <span class="dv">1</span>  <span class="co"># +1 for intercept</span></span>
-<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>        deviance <span class="op">=</span> model_summary.deviance</span>
-<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>        dispersion <span class="op">=</span> model_summary.devianceResiduals.select(<span class="st">"residuals"</span>).rdd.<span class="bu">map</span>(<span class="kw">lambda</span> x: x[<span class="dv">0</span>]<span class="op">**</span><span class="dv">2</span>).mean()</span>
-<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Log Likelihood calculation</span></span>
-<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>        log_likelihood <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (n_obs <span class="op">*</span> np.log(<span class="dv">2</span> <span class="op">*</span> np.pi) <span class="op">+</span> n_obs <span class="op">*</span> np.log(dispersion) <span class="op">+</span> deviance<span class="op">/</span>dispersion)</span>
-<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a>        <span class="co"># BIC calculation</span></span>
-<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>        bic <span class="op">=</span> k <span class="op">*</span> np.log(n_obs) <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> log_likelihood</span>
-<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> bic</span>
-<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
-<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
-<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a><span class="co"># Number of observations</span></span>
-<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a>n_obs <span class="op">=</span> test_df.count()</span>
-<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a>lr_bic <span class="op">=</span> calculate_bic(lr_model.summary, n_obs)</span>
-<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>poly_bic <span class="op">=</span> calculate_bic(lr_poly_model.summary, n_obs)</span>
-<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-71"><a href="#cb21-71" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparison DataFrame</span></span>
-<span id="cb21-72"><a href="#cb21-72" aria-hidden="true" tabindex="-1"></a>comparison_data <span class="op">=</span> {</span>
-<span id="cb21-73"><a href="#cb21-73" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Model'</span>: [<span class="st">'Linear Regression'</span>, <span class="st">'Polynomial Regression'</span>, <span class="st">'Random Forest'</span>],</span>
-<span id="cb21-74"><a href="#cb21-74" aria-hidden="true" tabindex="-1"></a>    <span class="st">'R²'</span>: [lr_r2, poly_r2, r2],</span>
-<span id="cb21-75"><a href="#cb21-75" aria-hidden="true" tabindex="-1"></a>    <span class="st">'RMSE'</span>: [lr_rmse, poly_rmse, rmse],</span>
-<span id="cb21-76"><a href="#cb21-76" aria-hidden="true" tabindex="-1"></a>    <span class="st">'MAE'</span>: [lr_mae, poly_mae, mae],</span>
-<span id="cb21-77"><a href="#cb21-77" aria-hidden="true" tabindex="-1"></a>    <span class="st">'AIC'</span>: [lr_aic, poly_aic, <span class="st">'N/A'</span>],</span>
-<span id="cb21-78"><a href="#cb21-78" aria-hidden="true" tabindex="-1"></a>    <span class="st">'BIC'</span>: [lr_bic, poly_bic, <span class="st">'N/A'</span>]</span>
-<span id="cb21-79"><a href="#cb21-79" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-80"><a href="#cb21-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-81"><a href="#cb21-81" aria-hidden="true" tabindex="-1"></a>comparison_df <span class="op">=</span> pd.DataFrame(comparison_data)</span>
-<span id="cb21-82"><a href="#cb21-82" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model Comparison:"</span>)</span>
-<span id="cb21-83"><a href="#cb21-83" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison_df.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="9cbac462" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Predictions for all three models</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>lr_predictions <span class="op">=</span> lr_model.transform(test_df)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>poly_predictions <span class="op">=</span> lr_poly_model.transform(test_poly)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>rf_predictions <span class="op">=</span> rf_model.transform(test_rf)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>evaluator <span class="op">=</span> RegressionEvaluator(labelCol<span class="op">=</span><span class="st">"SALARY"</span>, predictionCol<span class="op">=</span><span class="st">"prediction"</span>)</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Regression metrics</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>lr_r2 <span class="op">=</span> evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(lr_predictions)</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>lr_rmse <span class="op">=</span> evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(lr_predictions)</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>lr_mae <span class="op">=</span> evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(lr_predictions)</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a><span class="co"># AIC for Linear Regression</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>lr_aic <span class="op">=</span> lr_model.summary.aic</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Linear Regression AIC: </span><span class="sc">{</span>lr_aic<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Polynomial Regression metrics</span></span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>poly_r2 <span class="op">=</span> evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(poly_predictions)</span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>poly_rmse <span class="op">=</span> evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(poly_predictions)</span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>poly_mae <span class="op">=</span> evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(poly_predictions)</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a><span class="co"># AIC for Polynomial Regression</span></span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>poly_aic <span class="op">=</span> lr_poly_model.summary.aic</span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Polynomial Regression AIC: </span><span class="sc">{</span>poly_aic<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a><span class="co"># AIC is not directly available for Random Forest</span></span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>rf_aic <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a><span class="co"># BIC calculation for Linear and Polynomial models</span></span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> calculate_bic(model_summary, n_obs):</span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Calculate BIC for PySpark GeneralizedLinearRegression models"""</span></span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a>        k <span class="op">=</span> <span class="bu">len</span>(model_summary.coefficientStandardErrors) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a>        deviance <span class="op">=</span> model_summary.deviance</span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a>        dispersion <span class="op">=</span> model_summary.dispersion</span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Log Likelihood calculation</span></span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a>        log_likelihood <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> (n_obs <span class="op">*</span> np.log(<span class="dv">2</span> <span class="op">*</span> np.pi) <span class="op">+</span> n_obs <span class="op">*</span> np.log(dispersion) <span class="op">+</span> deviance<span class="op">/</span>dispersion)</span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># BIC calculation</span></span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a>        bic <span class="op">=</span> k <span class="op">*</span> np.log(n_obs) <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> log_likelihood</span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> bic</span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"BIC calculation failed: </span><span class="sc">{</span><span class="bu">str</span>(e)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a>n_obs <span class="op">=</span> test_df.count()</span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a>lr_bic <span class="op">=</span> calculate_bic(lr_model.summary, n_obs)</span>
+<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a>poly_bic <span class="op">=</span> calculate_bic(lr_poly_model.summary, n_obs)</span>
+<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-56"><a href="#cb35-56" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Linear Regression BIC: </span><span class="sc">{</span>lr_bic<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb35-57"><a href="#cb35-57" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Polynomial Regression BIC: </span><span class="sc">{</span>poly_bic<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb35-58"><a href="#cb35-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-59"><a href="#cb35-59" aria-hidden="true" tabindex="-1"></a>comparison_data <span class="op">=</span> {</span>
+<span id="cb35-60"><a href="#cb35-60" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Model'</span>: [<span class="st">'Generalized Linear Regression'</span>, <span class="st">'Polynomial Regression'</span>, <span class="st">'Random Forest'</span>],</span>
+<span id="cb35-61"><a href="#cb35-61" aria-hidden="true" tabindex="-1"></a>    <span class="st">'R²'</span>: [lr_r2, poly_r2, r2],</span>
+<span id="cb35-62"><a href="#cb35-62" aria-hidden="true" tabindex="-1"></a>    <span class="st">'RMSE'</span>: [lr_rmse, poly_rmse, rmse],</span>
+<span id="cb35-63"><a href="#cb35-63" aria-hidden="true" tabindex="-1"></a>    <span class="st">'MAE'</span>: [lr_mae, poly_mae, mae],</span>
+<span id="cb35-64"><a href="#cb35-64" aria-hidden="true" tabindex="-1"></a>    <span class="st">'AIC'</span>: [lr_aic, poly_aic, <span class="st">'N/A'</span>],</span>
+<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a>    <span class="st">'BIC'</span>: [lr_bic, poly_bic, <span class="st">'N/A'</span>]</span>
+<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a>comparison_df <span class="op">=</span> pd.DataFrame(comparison_data)</span>
+<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model Comparison:"</span>)</span>
+<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison_df.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 38:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 39:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 40:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 41:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 44:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 45:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 46:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 47:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 50:&gt;                                                         (0 + 1) / 1]</code></pre>
+<pre><code>[Stage 46:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 47:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 48:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 49:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Model Comparison:
-                Model       R²        RMSE         MAE           AIC  BIC
-    Linear Regression 0.999101 1269.832563  439.369707  45478.815531 None
-Polynomial Regression 0.999102 1269.217197  438.800343  45478.089457 None
-        Random Forest 0.972497 7022.572482 4380.591032           N/A  N/A</code></pre>
+<pre><code>Linear Regression AIC: 198674.9323303638</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[Stage 50:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 51:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 52:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 53:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Polynomial Regression AIC: 198675.85731451394</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[Stage 54:&gt;                                                         (0 + 1) / 1]</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear Regression BIC: 57339.69563876513
+Polynomial Regression BIC: 57346.620360372595
+Model Comparison:
+                        Model       R²        RMSE         MAE            AIC           BIC
+Generalized Linear Regression 0.999101 1269.832252  439.383598   198674.93233  57339.695639
+        Polynomial Regression 0.999102 1269.217725  438.815563  198675.857315   57346.62036
+                Random Forest 0.972497 7022.572482 4380.591032            N/A           N/A</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>                                                                                </code></pre>
@@ -627,59 +666,70 @@ Polynomial Regression 0.999102 1269.217197  438.800343  45478.089457 None
 </div>
 <section id="visualization-comparison" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="visualization-comparison"><span class="header-section-number">5.1</span> Visualization Comparison</h3>
-<div id="73d1cba4" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert predictions to pandas for plotting</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>lr_pd <span class="op">=</span> lr_predictions.select(<span class="st">"SALARY"</span>, <span class="st">"prediction"</span>).toPandas()</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>poly_pd <span class="op">=</span> poly_predictions.select(<span class="st">"SALARY"</span>, <span class="st">"prediction"</span>).toPandas()</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>rf_pd <span class="op">=</span> rf_predictions.select(<span class="st">"SALARY"</span>, <span class="st">"prediction"</span>).toPandas()</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># .q    2x2 grid plot</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">12</span>))</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">'Model Predictions vs Actual Values'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Regression</span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].scatter(lr_pd[<span class="st">'SALARY'</span>], lr_pd[<span class="st">'prediction'</span>], alpha<span class="op">=</span><span class="fl">0.6</span>, color<span class="op">=</span><span class="st">'blue'</span>)</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].plot([lr_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), lr_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()],</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>                [lr_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), lr_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()], <span class="st">'r--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_xlabel(<span class="st">'Actual Salary'</span>)</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_ylabel(<span class="st">'Predicted Salary'</span>)</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_title(<span class="ss">f'Linear Regression (R² = </span><span class="sc">{</span>lr_r2<span class="sc">:.3f}</span><span class="ss">)'</span>)</span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Polynomial Regression</span></span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].scatter(poly_pd[<span class="st">'SALARY'</span>], poly_pd[<span class="st">'prediction'</span>], alpha<span class="op">=</span><span class="fl">0.6</span>, color<span class="op">=</span><span class="st">'green'</span>)</span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].plot([poly_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), poly_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()],</span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>                [poly_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), poly_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()], <span class="st">'r--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].set_xlabel(<span class="st">'Actual Salary'</span>)</span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].set_ylabel(<span class="st">'Predicted Salary'</span>)</span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].set_title(<span class="ss">f'Polynomial Regression (R² = </span><span class="sc">{</span>poly_r2<span class="sc">:.3f}</span><span class="ss">)'</span>)</span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest</span></span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].scatter(rf_pd[<span class="st">'SALARY'</span>], rf_pd[<span class="st">'prediction'</span>], alpha<span class="op">=</span><span class="fl">0.6</span>, color<span class="op">=</span><span class="st">'orange'</span>)</span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].plot([rf_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), rf_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()],</span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>                [rf_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), rf_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()], <span class="st">'r--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_xlabel(<span class="st">'Actual Salary'</span>)</span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_ylabel(<span class="st">'Predicted Salary'</span>)</span>
-<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_title(<span class="ss">f'Random Forest (R² = </span><span class="sc">{</span>r2<span class="sc">:.3f}</span><span class="ss">)'</span>)</span>
-<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Model comparison bar chart</span></span>
-<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].bar([<span class="st">'Linear'</span>, <span class="st">'Polynomial'</span>, <span class="st">'Random Forest'</span>],</span>
-<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>               [lr_r2, poly_r2, r2],</span>
-<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a>               color<span class="op">=</span>[<span class="st">'blue'</span>, <span class="st">'green'</span>, <span class="st">'orange'</span>], alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
-<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].set_ylabel(<span class="st">'R² Score'</span>)</span>
-<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].set_title(<span class="st">'Model Performance Comparison (R²)'</span>)</span>
-<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">"_output/model_comparison.png"</span>, dpi<span class="op">=</span><span class="dv">300</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
-<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a>plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="e3dd7ad4" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>lr_pd <span class="op">=</span> lr_predictions.select(<span class="st">"SALARY"</span>, <span class="st">"prediction"</span>).toPandas()</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>poly_pd <span class="op">=</span> poly_predictions.select(<span class="st">"SALARY"</span>, <span class="st">"prediction"</span>).toPandas()</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>rf_pd <span class="op">=</span> rf_predictions.select(<span class="st">"SALARY"</span>, <span class="st">"prediction"</span>).toPandas()</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">12</span>))</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">'Model Predictions vs Actual Values'</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Generalized Linear Regression</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].scatter(lr_pd[<span class="st">'SALARY'</span>], lr_pd[<span class="st">'prediction'</span>], alpha<span class="op">=</span><span class="fl">0.6</span>, color<span class="op">=</span><span class="st">'blue'</span>)</span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].plot([lr_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), lr_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()],</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>                [lr_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), lr_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()], <span class="st">'r--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_xlabel(<span class="st">'Actual Salary'</span>)</span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_ylabel(<span class="st">'Predicted Salary'</span>)</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_title(<span class="ss">f'Linear Regression (R² = </span><span class="sc">{</span>lr_r2<span class="sc">:.3f}</span><span class="ss">)'</span>)</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Polynomial Regression</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].scatter(poly_pd[<span class="st">'SALARY'</span>], poly_pd[<span class="st">'prediction'</span>], alpha<span class="op">=</span><span class="fl">0.6</span>, color<span class="op">=</span><span class="st">'green'</span>)</span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].plot([poly_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), poly_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()],</span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>                [poly_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), poly_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()], <span class="st">'r--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].set_xlabel(<span class="st">'Actual Salary'</span>)</span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].set_ylabel(<span class="st">'Predicted Salary'</span>)</span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].set_title(<span class="ss">f'Polynomial Regression (R² = </span><span class="sc">{</span>poly_r2<span class="sc">:.3f}</span><span class="ss">)'</span>)</span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">1</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest</span></span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].scatter(rf_pd[<span class="st">'SALARY'</span>], rf_pd[<span class="st">'prediction'</span>], alpha<span class="op">=</span><span class="fl">0.6</span>, color<span class="op">=</span><span class="st">'orange'</span>)</span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].plot([rf_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), rf_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()],</span>
+<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a>                [rf_pd[<span class="st">'SALARY'</span>].<span class="bu">min</span>(), rf_pd[<span class="st">'SALARY'</span>].<span class="bu">max</span>()], <span class="st">'r--'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_xlabel(<span class="st">'Actual Salary'</span>)</span>
+<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_ylabel(<span class="st">'Predicted Salary'</span>)</span>
+<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_title(<span class="ss">f'Random Forest (R² = </span><span class="sc">{</span>r2<span class="sc">:.3f}</span><span class="ss">)'</span>)</span>
+<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Model comparison bar chart using Seaborn</span></span>
+<span id="cb43-39"><a href="#cb43-39" aria-hidden="true" tabindex="-1"></a>model_names <span class="op">=</span> [<span class="st">'Linear'</span>, <span class="st">'Polynomial'</span>, <span class="st">'Random Forest'</span>]</span>
+<span id="cb43-40"><a href="#cb43-40" aria-hidden="true" tabindex="-1"></a>r2_scores <span class="op">=</span> [lr_r2, poly_r2, r2]</span>
+<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'blue'</span>, <span class="st">'green'</span>, <span class="st">'orange'</span>]</span>
+<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a>comparison_plot_df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Model'</span>: model_names,</span>
+<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">'R²'</span>: r2_scores</span>
+<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-47"><a href="#cb43-47" aria-hidden="true" tabindex="-1"></a>sns.barplot(data<span class="op">=</span>comparison_plot_df, x<span class="op">=</span><span class="st">'R²'</span>, y<span class="op">=</span><span class="st">'Model'</span>, palette<span class="op">=</span>colors, ax<span class="op">=</span>axes[<span class="dv">1</span>, <span class="dv">1</span>])</span>
+<span id="cb43-48"><a href="#cb43-48" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].set_xlabel(<span class="st">'R² Score'</span>)</span>
+<span id="cb43-49"><a href="#cb43-49" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].set_title(<span class="st">'Model Performance Comparison (R²)'</span>)</span>
+<span id="cb43-50"><a href="#cb43-50" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">1</span>].grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb43-51"><a href="#cb43-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-52"><a href="#cb43-52" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb43-53"><a href="#cb43-53" aria-hidden="true" tabindex="-1"></a>plt.savefig(<span class="st">"_output/model_comparison.png"</span>, dpi<span class="op">=</span><span class="dv">300</span>, bbox_inches<span class="op">=</span><span class="st">'tight'</span>)</span>
+<span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 53:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 54:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 55:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 57:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 58:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 59:&gt;                                                         (0 + 1) / 1]                                                                                /tmp/ipykernel_7983/3842274766.py:47: FutureWarning:
+
+
+
+Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `y` variable to `hue` and set `legend=False` for the same effect.
+
+</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
