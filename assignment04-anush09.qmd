@@ -21,6 +21,7 @@ execute:
   echo: false
   eval: false
   freeze: auto
+  warning: false
 ---
 
 ## Github URL
