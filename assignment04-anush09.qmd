@@ -26,6 +26,12 @@ execute:
 ## Github URL
 https://github.com/met-ad-688/assignment-04-anush-09.git
 
+## Generative AI Use Declaration
+1. Used AI for code cleaning and sorting errors.
+2. Used it for figuring out some plotting issues in the last cell.
+
+## Note to Instructor:
+I used Generalized Linear Regression considering Module05 Lab02 Section4.
 
 ```{python}
 #| eval: true
@@ -154,6 +160,7 @@ try:
     coef_df.show(truncate=False)
 
 except Exception as e:
+    # Actualy not needed for GLR but I added it when I was previously using LR.
     print("Coefficient statistics not available (L-BGFS fallback):", str(e))
 # df_final.printSchema()
 ```
@@ -218,6 +225,7 @@ try:
     coef_poly_df.show(truncate=False)
 
 except Exception as e:
+    # Actualy not needed for GLR but I added it when I was previously using LR.
     print("Coefficient statistics not available (L-BGFS fallback):", str(e))
 ```
 ### Inference

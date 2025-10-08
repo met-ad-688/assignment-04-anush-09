@@ -83,11 +83,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul class="collapse">
-  <li><a href="#feature-engineering" id="toc-feature-engineering" class="nav-link active" data-scroll-target="#feature-engineering"><span class="header-section-number">1</span> Feature Engineering</a></li>
-  <li><a href="#generalized-linear-regression-model" id="toc-generalized-linear-regression-model" class="nav-link" data-scroll-target="#generalized-linear-regression-model"><span class="header-section-number">2</span> Generalized Linear Regression model</a></li>
-  <li><a href="#polynomial-regression-model" id="toc-polynomial-regression-model" class="nav-link" data-scroll-target="#polynomial-regression-model"><span class="header-section-number">3</span> Polynomial Regression model</a></li>
-  <li><a href="#random-forest-regression" id="toc-random-forest-regression" class="nav-link" data-scroll-target="#random-forest-regression"><span class="header-section-number">4</span> Random Forest Regression</a></li>
-  <li><a href="#model-comparison" id="toc-model-comparison" class="nav-link" data-scroll-target="#model-comparison"><span class="header-section-number">5</span> Model Comparison</a></li>
+  <li><a href="#github-url" id="toc-github-url" class="nav-link active" data-scroll-target="#github-url"><span class="header-section-number">1</span> Github URL</a></li>
+  <li><a href="#generative-ai-use-declaration" id="toc-generative-ai-use-declaration" class="nav-link" data-scroll-target="#generative-ai-use-declaration"><span class="header-section-number">2</span> Generative AI Use Declaration</a></li>
+  <li><a href="#note-to-instructor" id="toc-note-to-instructor" class="nav-link" data-scroll-target="#note-to-instructor"><span class="header-section-number">3</span> Note to Instructor:</a></li>
+  <li><a href="#feature-engineering" id="toc-feature-engineering" class="nav-link" data-scroll-target="#feature-engineering"><span class="header-section-number">4</span> Feature Engineering</a></li>
+  <li><a href="#generalized-linear-regression-model" id="toc-generalized-linear-regression-model" class="nav-link" data-scroll-target="#generalized-linear-regression-model"><span class="header-section-number">5</span> Generalized Linear Regression model</a></li>
+  <li><a href="#polynomial-regression-model" id="toc-polynomial-regression-model" class="nav-link" data-scroll-target="#polynomial-regression-model"><span class="header-section-number">6</span> Polynomial Regression model</a></li>
+  <li><a href="#random-forest-regression" id="toc-random-forest-regression" class="nav-link" data-scroll-target="#random-forest-regression"><span class="header-section-number">7</span> Random Forest Regression</a></li>
+  <li><a href="#model-comparison" id="toc-model-comparison" class="nav-link" data-scroll-target="#model-comparison"><span class="header-section-number">8</span> Model Comparison</a></li>
   </ul>
 </nav>
 </div>
@@ -137,7 +140,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="782077c9" class="cell" data-execution_count="1">
+<section id="github-url" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="github-url"><span class="header-section-number">1</span> Github URL</h2>
+<p>https://github.com/met-ad-688/assignment-04-anush-09.git</p>
+</section>
+<section id="generative-ai-use-declaration" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="generative-ai-use-declaration"><span class="header-section-number">2</span> Generative AI Use Declaration</h2>
+<ol type="1">
+<li>Used AI for code cleaning and sorting errors.</li>
+<li>Used it for figuring out some plotting issues in the last cell.</li>
+</ol>
+</section>
+<section id="note-to-instructor" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="note-to-instructor"><span class="header-section-number">3</span> Note to Instructor:</h2>
+<p>I used Generalized Linear Regression considering Module05 Lab02 Section4.</p>
+<div id="695f55f4" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.sql <span class="im">import</span> SparkSession</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
@@ -160,15 +177,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># # df.printSchema() # comment this line when rendering the submission</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># df.show(5)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Setting default log level to "WARN".
-To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
-25/10/08 02:46:37 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
-[Stage 1:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 61:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 </div>
-<section id="feature-engineering" class="level2" data-number="1">
-<h2 data-number="1" class="anchored" data-anchor-id="feature-engineering"><span class="header-section-number">1</span> Feature Engineering</h2>
-<div id="11fe985b" class="cell" data-execution_count="2">
+</section>
+<section id="feature-engineering" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="feature-engineering"><span class="header-section-number">4</span> Feature Engineering</h2>
+<div id="381bfceb" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.sql.functions <span class="im">import</span> col, <span class="bu">pow</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.feature <span class="im">import</span> StringIndexer, OneHotEncoder, VectorAssembler</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml <span class="im">import</span> Pipeline</span>
@@ -212,11 +227,10 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 <span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    inputCols<span class="op">=</span>[<span class="st">"features"</span>, <span class="st">"MIN_YEARS_EXPERIENCE_SQ"</span>],</span>
 <span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    outputCol<span class="op">=</span><span class="st">"features_poly"</span></span>
 <span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> poly_assembler.transform(df_poly) <span class="co"># final structure</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> poly_assembler.transform(df_poly)</span>
 <span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>df_final.show(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 2:&gt;                                                          (0 + 1) / 1]                                                                                [Stage 5:&gt;                                                          (0 + 1) / 1]                                                                                25/10/08 02:47:11 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
-[Stage 8:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 62:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 65:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>+--------------------+-----------------+----------------------+----------+--------+---------+--------+-------------------+--------------------+--------------------+-----------+-------------------+--------------------+--------------------+---------------+----------------+--------+------------+-----------+-------------------+----------------+---------------------+-------------+-------------------+-------------+------------------+---------------+--------------------+--------------------+--------------------+-------------+------+-----------+----------------+-------------------+---------+-----------+--------------------+--------------------+------------------+------+--------------------+-----+--------------------+-----+----------+---------------+--------------------+---------------+--------------------+------------+--------------------+------------+--------------------+------+--------------------+------+--------------------+------+--------------------+------+--------------------+------+--------------------+------------------+--------------------+--------------------+--------------------+--------------------+--------------------+-----------------------+--------------+-------------------+--------------------+--------------------+--------------------+--------------------+----------+--------------------+----------+--------------------+-----------------+--------------------+---------------+--------------------+------------+--------------------+----------+--------------------+----------+--------------------+----------+---------------+----------+---------------+---------------+--------------------+--------------+--------------------+--------------------------+-------------------------------+--------------------+-------------------------+-----------------------------+----------------------------------+-----------------+----------------------+-----------------------+----------------------------+------------------+-----------------------+-------+--------------------+-------+--------------------+-------+---------------+-------+---------------+-----------------+----------------------+------------+--------------------+------------+--------------------+------------+--------------------+------------+--------------------+------------+--------------------+------------------------+--------------+------------------------+---------------+--------------------+-----------------------+--------------------+
@@ -233,9 +247,9 @@ only showing top 5 rows
 </div>
 </div>
 </section>
-<section id="generalized-linear-regression-model" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="generalized-linear-regression-model"><span class="header-section-number">2</span> Generalized Linear Regression model</h2>
-<div id="0692597a" class="cell" data-execution_count="3">
+<section id="generalized-linear-regression-model" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="generalized-linear-regression-model"><span class="header-section-number">5</span> Generalized Linear Regression model</h2>
+<div id="8a96d4c9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> GeneralizedLinearRegression(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    family<span class="op">=</span><span class="st">"gaussian"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    link<span class="op">=</span><span class="st">"identity"</span>,</span>
@@ -278,35 +292,36 @@ only showing top 5 rows
 <span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    coef_df.show(truncate<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co"># df_final.printSchema()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Actualy not needed for GLR but I added it when I was previously using LR.</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co"># df_final.printSchema()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 9:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 69:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Coefficients: [0.10577257338987292,0.4897760646675632,0.5031355811149286,5.821447063989891,-63.13234211764908,-37.24918495447914,240.2496005871974,48.31465068112287,152.96207700756838,-176.77153212602502,85.33910314560474,434.28702577440487,-161.42079058360767,-15.678039153034717,-118.88023960359375,-161.45114829498186,-102.29690138402427,202.46320733110622,-141.30430068749794,-10.336921084699812,46.18232664748482,-139.7522513504501,-91.77765784576877,756.3227801189014,88.81214010053442,-194.06691355630176,92.42948084492659,-238.66548174672735,-232.9013492626481,49.64728458137663,-169.13719812248235,-145.48484292668024,-121.95157094464349,-99.6819901995056,-159.90690621771986,-201.88892491962216,-187.93226914248663,-97.41512683302918,-200.87692671645,-193.2008460392148,-224.35294989361188,50.530082652301964,42.19504489586543,-80.67373549847771,-132.2894187558734,-134.85646865840482,-191.28731365448144,-161.90766503071904,147.48514217917366,344.69364885521287,172.6083494391896,-142.18206008275982,-192.08893673890222,-86.81171897251811,-139.9320627067798,-118.84967713486162,374.329274291932,-226.00705073681388]
 Intercept: 771.471741322882</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 10:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 70:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R²: 0.9991007618414153</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 11:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 71:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>RMSE: 1269.8322518177556</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 12:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 72:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>MAE: 439.38359836620407</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 13:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 16:&gt;                                                         (0 + 1) / 1]</code></pre>
+<pre><code>[Stage 73:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>+-------------------+---------------------+----------------------+-------------------+-------------------+------------------+
@@ -336,71 +351,69 @@ Intercept: 771.471741322882</code></pre>
 only showing top 20 rows
 </code></pre>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>                                                                                </code></pre>
 </div>
-</div>
-<section id="inference" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="inference"><span class="header-section-number">2.1</span> Inference</h3>
+<section id="inference" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="inference"><span class="header-section-number">5.1</span> Inference</h3>
 <p>The Generalized Linear Regression model gave very high accuracy (R² ≈ 0.9991), explaining almost all variation in salaries. Prediction errors were very small (RMSE ≈ 1269, MAE ≈ 439). As expected, more years of experience are linked with higher pay, and job type and location also matter. Looking at coefficients, some predictors (like the second and third features) are highly significant with very low p‑values, while many others have large standard errors and are not statistically meaningful. This shows the presence of multicollinearity: several features are strongly correlated, so the model predicts well overall but individual coefficient estimates are unstable.</p>
 </section>
 </section>
-<section id="polynomial-regression-model" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="polynomial-regression-model"><span class="header-section-number">3</span> Polynomial Regression model</h2>
-<div id="52a3b5c2" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> GeneralizedLinearRegression</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># train/test</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>train_poly, test_poly <span class="op">=</span> df_final.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">42</span>)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Regression model using polynomial features</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>lr_poly <span class="op">=</span> GeneralizedLinearRegression(</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    family<span class="op">=</span><span class="st">"gaussian"</span>,</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    link<span class="op">=</span><span class="st">"identity"</span>,</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features_poly"</span>,</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    maxIter<span class="op">=</span><span class="dv">10</span>,</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    regParam<span class="op">=</span><span class="fl">0.3</span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">#  Fit model on training data</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>lr_poly_model <span class="op">=</span> lr_poly.fit(train_poly)</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>poly_predictions <span class="op">=</span> lr_poly_model.transform(test_poly)</span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>evaluator <span class="op">=</span> RegressionEvaluator(labelCol<span class="op">=</span><span class="st">"SALARY"</span>, predictionCol<span class="op">=</span><span class="st">"prediction"</span>)</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Polynomial Regression Results"</span>)</span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficients:"</span>, lr_poly_model.coefficients)</span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Intercept:"</span>, lr_poly_model.intercept)</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(poly_predictions))</span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(poly_predictions))</span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(poly_predictions))</span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficient statistics</span></span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>poly_summary <span class="op">=</span> lr_poly_model.summary</span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    coefs <span class="op">=</span> lr_poly_model.coefficients.toArray().tolist()</span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> poly_summary.coefficientStandardErrors</span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>    tvals <span class="op">=</span> poly_summary.tValues</span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>    pvals <span class="op">=</span> poly_summary.pValues</span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>    coef_poly_df <span class="op">=</span> spark.createDataFrame(</span>
-<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>        [</span>
-<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>            (<span class="bu">float</span>(coefs[i]), <span class="bu">float</span>(se[i]), <span class="bu">float</span>(tvals[i]), <span class="bu">float</span>(pvals[i]),</span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>             <span class="bu">float</span>(coefs[i] <span class="op">-</span> <span class="fl">1.96</span><span class="op">*</span>se[i]), <span class="bu">float</span>(coefs[i] <span class="op">+</span> <span class="fl">1.96</span><span class="op">*</span>se[i]))</span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(coefs))</span>
-<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>        ],</span>
-<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"Coefficient"</span>, <span class="st">"StdError"</span>, <span class="st">"tValue"</span>, <span class="st">"pValue"</span>, <span class="st">"CI_lower"</span>, <span class="st">"CI_upper"</span>]</span>
-<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>    coef_poly_df.show(truncate<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="polynomial-regression-model" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="polynomial-regression-model"><span class="header-section-number">6</span> Polynomial Regression model</h2>
+<div id="007d448a" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> GeneralizedLinearRegression</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># train/test</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>train_poly, test_poly <span class="op">=</span> df_final.randomSplit([<span class="fl">0.8</span>, <span class="fl">0.2</span>], seed<span class="op">=</span><span class="dv">42</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Regression model using polynomial features</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>lr_poly <span class="op">=</span> GeneralizedLinearRegression(</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    family<span class="op">=</span><span class="st">"gaussian"</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    link<span class="op">=</span><span class="st">"identity"</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    featuresCol<span class="op">=</span><span class="st">"features_poly"</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    labelCol<span class="op">=</span><span class="st">"SALARY"</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    maxIter<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    regParam<span class="op">=</span><span class="fl">0.3</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co">#  Fit model on training data</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>lr_poly_model <span class="op">=</span> lr_poly.fit(train_poly)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>poly_predictions <span class="op">=</span> lr_poly_model.transform(test_poly)</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>evaluator <span class="op">=</span> RegressionEvaluator(labelCol<span class="op">=</span><span class="st">"SALARY"</span>, predictionCol<span class="op">=</span><span class="st">"prediction"</span>)</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Polynomial Regression Results"</span>)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficients:"</span>, lr_poly_model.coefficients)</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Intercept:"</span>, lr_poly_model.intercept)</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"R²:"</span>, evaluator.setMetricName(<span class="st">"r2"</span>).evaluate(poly_predictions))</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, evaluator.setMetricName(<span class="st">"rmse"</span>).evaluate(poly_predictions))</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, evaluator.setMetricName(<span class="st">"mae"</span>).evaluate(poly_predictions))</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficient statistics</span></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>poly_summary <span class="op">=</span> lr_poly_model.summary</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>    coefs <span class="op">=</span> lr_poly_model.coefficients.toArray().tolist()</span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> poly_summary.coefficientStandardErrors</span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>    tvals <span class="op">=</span> poly_summary.tValues</span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>    pvals <span class="op">=</span> poly_summary.pValues</span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>    coef_poly_df <span class="op">=</span> spark.createDataFrame(</span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>            (<span class="bu">float</span>(coefs[i]), <span class="bu">float</span>(se[i]), <span class="bu">float</span>(tvals[i]), <span class="bu">float</span>(pvals[i]),</span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>             <span class="bu">float</span>(coefs[i] <span class="op">-</span> <span class="fl">1.96</span><span class="op">*</span>se[i]), <span class="bu">float</span>(coefs[i] <span class="op">+</span> <span class="fl">1.96</span><span class="op">*</span>se[i]))</span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(coefs))</span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>        [<span class="st">"Coefficient"</span>, <span class="st">"StdError"</span>, <span class="st">"tValue"</span>, <span class="st">"pValue"</span>, <span class="st">"CI_lower"</span>, <span class="st">"CI_upper"</span>]</span>
+<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a>    coef_poly_df.show(truncate<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Actualy not needed for GLR but I added it when I was previously using LR.</span></span>
+<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Coefficient statistics not available (L-BGFS fallback):"</span>, <span class="bu">str</span>(e))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 17:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 77:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Polynomial Regression Results
@@ -408,25 +421,25 @@ Coefficients: [0.10864189686946173,0.4898446498795814,0.5031330094998685,-7.2940
 Intercept: 795.9342167087742</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 18:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 78:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R²: 0.9991016319916092</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 19:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 79:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>RMSE: 1269.2177248430587</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 20:&gt;                                                         (0 + 1) / 1]</code></pre>
+<pre><code>[Stage 80:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>MAE: 438.815563380054</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>                                                                                [Stage 21:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 81:&gt;                                                         (0 + 1) / 1]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>+-------------------+---------------------+----------------------+------------------+-------------------+-------------------+
@@ -456,15 +469,18 @@ Intercept: 795.9342167087742</code></pre>
 only showing top 20 rows
 </code></pre>
 </div>
+<div class="cell-output cell-output-stderr">
+<pre><code>                                                                                </code></pre>
 </div>
-<section id="inference-1" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="inference-1"><span class="header-section-number">3.1</span> Inference</h3>
+</div>
+<section id="inference-1" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="inference-1"><span class="header-section-number">6.1</span> Inference</h3>
 <p>The Polynomial Regression model also achieved very high accuracy (R² ≈ 0.9991), explaining nearly all variation in salaries. Errors were very small (RMSE ≈ 1269, MAE ≈ 439), almost the same as the linear model. The results again confirm that experience, job type, and location strongly influence pay. Looking at coefficients, a few predictors (like the second and third features) are highly significant with very low p‑values, but many others show very large standard errors and are not statistically reliable. This again points to multicollinearity: several features overlap in information, so while the model predicts salaries very well, the individual coefficient estimates remain unstable</p>
 </section>
 </section>
-<section id="random-forest-regression" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="random-forest-regression"><span class="header-section-number">4</span> Random Forest Regression</h2>
-<div id="8193ab9e" class="cell" data-execution_count="5">
+<section id="random-forest-regression" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="random-forest-regression"><span class="header-section-number">7</span> Random Forest Regression</h2>
+<div id="136884e7" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> RandomForestRegressor</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -497,14 +513,9 @@ only showing top 20 rows
 <span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, rmse)</span>
 <span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, mae)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 25:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 26:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 27:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 29:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 31:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 33:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 35:&gt;                                                         (0 + 1) / 1][Stage 36:&gt;                                                         (0 + 1) / 1]                                                                                25/10/08 02:49:59 WARN DAGScheduler: Broadcasting large task binary with size 1244.7 KiB
-[Stage 37:&gt;                                                         (0 + 1) / 1][Stage 38:&gt;                                                         (0 + 1) / 1]                                                                                25/10/08 02:50:03 WARN DAGScheduler: Broadcasting large task binary with size 2.2 MiB
-[Stage 39:&gt;                                                         (0 + 1) / 1][Stage 40:&gt;                                                         (0 + 1) / 1]                                                                                WARNING: An illegal reflective access operation has occurred
-WARNING: Illegal reflective access by org.apache.spark.util.SizeEstimator$ (file:/opt/spark-3.5.6-bin-hadoop3/jars/spark-core_2.12-3.5.6.jar) to field java.nio.charset.Charset.name
-WARNING: Please consider reporting this to the maintainers of org.apache.spark.util.SizeEstimator$
-WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-WARNING: All illegal access operations will be denied in a future release
-[Stage 41:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 42:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 43:&gt;                                                         (0 + 1) / 1]</code></pre>
+<pre><code>[Stage 85:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 86:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 87:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 89:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 91:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 93:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 95:&gt;                                                         (0 + 1) / 1]                                                                                25/10/08 03:30:43 WARN DAGScheduler: Broadcasting large task binary with size 1244.7 KiB
+[Stage 97:&gt;                                                         (0 + 1) / 1]                                                                                25/10/08 03:30:45 WARN DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+[Stage 99:&gt;                                                         (0 + 1) / 1][Stage 100:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 101:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 102:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 103:&gt;                                                        (0 + 1) / 1]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Random Forest Results
@@ -516,9 +527,9 @@ MAE: 4380.591032239985</code></pre>
 <pre><code>                                                                                </code></pre>
 </div>
 </div>
-<section id="feature-importance-plot" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="feature-importance-plot"><span class="header-section-number">4.1</span> Feature Importance Plot</h3>
-<div id="5e263da8" class="cell" data-execution_count="6">
+<section id="feature-importance-plot" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="feature-importance-plot"><span class="header-section-number">7.1</span> Feature Importance Plot</h3>
+<div id="8e669cc1" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -553,7 +564,7 @@ MAE: 4380.591032239985</code></pre>
 <span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
 <span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a>plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/tmp/ipykernel_3164/192427344.py:28: FutureWarning:
+<pre><code>/tmp/ipykernel_4414/192427344.py:28: FutureWarning:
 
 
 
@@ -570,14 +581,14 @@ Passing `palette` without assigning `hue` is deprecated and will be removed in v
 </div>
 </div>
 </section>
-<section id="inference-2" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="inference-2"><span class="header-section-number">4.2</span> Inference</h3>
+<section id="inference-2" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="inference-2"><span class="header-section-number">7.2</span> Inference</h3>
 <p>The Random Forest model explained about 97% of salary variation (R² ≈ 0.97). But its errors were higher (RMSE ≈ 7023, MAE ≈ 4381) compared to linear models. From feature importance, we see that SALARY_TO and SALARY_FROM are the main drivers, with years of experience adding some effect. Other features like job type and state have very small impact. This means the model predicts well, but it mostly depends on salary range fields and gives less extra insight.</p>
 </section>
 </section>
-<section id="model-comparison" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="model-comparison"><span class="header-section-number">5</span> Model Comparison</h2>
-<div id="a1e67c58" class="cell" data-execution_count="7">
+<section id="model-comparison" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="model-comparison"><span class="header-section-number">8</span> Model Comparison</h2>
+<div id="e58b2eae" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
@@ -649,19 +660,19 @@ Passing `palette` without assigning `hue` is deprecated and will be removed in v
 <span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Model Comparison:"</span>)</span>
 <span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(comparison_df.to_string(index<span class="op">=</span><span class="va">False</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 46:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 47:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 48:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 49:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 106:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 107:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 108:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 109:&gt;                                                        (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear Regression AIC: 198674.9323303638</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 50:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 51:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 52:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 53:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
+<pre><code>[Stage 110:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 111:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 112:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 113:&gt;                                                        (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Polynomial Regression AIC: 198675.85731451394</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 54:&gt;                                                         (0 + 1) / 1]</code></pre>
+<pre><code>[Stage 114:&gt;                                                        (0 + 1) / 1]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear Regression BIC: 57339.69563876513
@@ -676,9 +687,9 @@ Generalized Linear Regression 0.999101 1269.832252  439.383598   198674.93233  5
 <pre><code>                                                                                </code></pre>
 </div>
 </div>
-<section id="visualization-comparison" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="visualization-comparison"><span class="header-section-number">5.1</span> Visualization Comparison</h3>
-<div id="e6d917dc" class="cell" data-execution_count="8">
+<section id="visualization-comparison" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="visualization-comparison"><span class="header-section-number">8.1</span> Visualization Comparison</h3>
+<div id="1166f645" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -735,7 +746,7 @@ Generalized Linear Regression 0.999101 1269.832252  439.383598   198674.93233  5
 <span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
 <span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 57:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 58:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 59:&gt;                                                         (0 + 1) / 1]                                                                                /tmp/ipykernel_3164/3842274766.py:47: FutureWarning:
+<pre><code>[Stage 117:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 118:&gt;                                                        (0 + 1) / 1]                                                                                [Stage 119:&gt;                                                        (0 + 1) / 1]                                                                                /tmp/ipykernel_4414/3842274766.py:47: FutureWarning:
 
 
 
@@ -752,8 +763,8 @@ Passing `palette` without assigning `hue` is deprecated and will be removed in v
 </div>
 </div>
 </section>
-<section id="inference-3" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="inference-3"><span class="header-section-number">5.2</span> Inference</h3>
+<section id="inference-3" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="inference-3"><span class="header-section-number">8.2</span> Inference</h3>
 <p>Both the Generalized Linear Regression and Polynomial Regression models performed almost identically, with R² ≈ 0.9991 and very low errors (RMSE ≈ 1269, MAE ≈ 439). Their AIC and BIC values are also very close, showing no real advantage of adding polynomial terms. The Random Forest model explained less variation (R² ≈ 0.97) and had much higher errors (RMSE ≈ 7023, MAE ≈ 4381). Since AIC and BIC are not available for Random Forest, comparison is based only on accuracy metrics. Overall, the linear models clearly outperform Random Forest for this dataset. Between them, the simpler Generalized Linear Regression is preferable, as it achieves the same accuracy with lower complexity and easier interpretation.</p>
 </section>
 </section>
