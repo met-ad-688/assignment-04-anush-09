@@ -126,7 +126,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">October 7, 2025</p>
+      <p class="date-modified">October 8, 2025</p>
     </div>
   </div>
     
@@ -137,7 +137,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="e3a53b25" class="cell" data-execution_count="1">
+<div id="782077c9" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.sql <span class="im">import</span> SparkSession</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
@@ -162,13 +162,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stderr">
 <pre><code>Setting default log level to "WARN".
 To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
-25/10/07 04:55:00 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+25/10/08 02:46:37 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
 [Stage 1:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
 </div>
 </div>
 <section id="feature-engineering" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="feature-engineering"><span class="header-section-number">1</span> Feature Engineering</h2>
-<div id="6d5be54f" class="cell" data-execution_count="2">
+<div id="11fe985b" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.sql.functions <span class="im">import</span> col, <span class="bu">pow</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.feature <span class="im">import</span> StringIndexer, OneHotEncoder, VectorAssembler</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml <span class="im">import</span> Pipeline</span>
@@ -215,7 +215,7 @@ To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLeve
 <span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> poly_assembler.transform(df_poly) <span class="co"># final structure</span></span>
 <span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>df_final.show(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 2:&gt;                                                          (0 + 1) / 1]                                                                                [Stage 5:&gt;                                                          (0 + 1) / 1]                                                                                25/10/07 04:55:33 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+<pre><code>[Stage 2:&gt;                                                          (0 + 1) / 1]                                                                                [Stage 5:&gt;                                                          (0 + 1) / 1]                                                                                25/10/08 02:47:11 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
 [Stage 8:&gt;                                                          (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -235,7 +235,7 @@ only showing top 5 rows
 </section>
 <section id="generalized-linear-regression-model" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="generalized-linear-regression-model"><span class="header-section-number">2</span> Generalized Linear Regression model</h2>
-<div id="19761e6c" class="cell" data-execution_count="3">
+<div id="0692597a" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lr <span class="op">=</span> GeneralizedLinearRegression(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    family<span class="op">=</span><span class="st">"gaussian"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    link<span class="op">=</span><span class="st">"identity"</span>,</span>
@@ -300,13 +300,13 @@ Intercept: 771.471741322882</code></pre>
 <pre><code>RMSE: 1269.8322518177556</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 12:&gt;                                                         (0 + 1) / 1]</code></pre>
+<pre><code>[Stage 12:&gt;                                                         (0 + 1) / 1]                                                                                </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>MAE: 439.38359836620407</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>                                                                                [Stage 13:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 16:&gt;                                                         (0 + 1) / 1]</code></pre>
+<pre><code>[Stage 13:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 16:&gt;                                                         (0 + 1) / 1]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>+-------------------+---------------------+----------------------+-------------------+-------------------+------------------+
@@ -340,10 +340,14 @@ only showing top 20 rows
 <pre><code>                                                                                </code></pre>
 </div>
 </div>
+<section id="inference" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="inference"><span class="header-section-number">2.1</span> Inference</h3>
+<p>The Generalized Linear Regression model gave very high accuracy (R² ≈ 0.9991), explaining almost all variation in salaries. Prediction errors were very small (RMSE ≈ 1269, MAE ≈ 439). As expected, more years of experience are linked with higher pay, and job type and location also matter. Looking at coefficients, some predictors (like the second and third features) are highly significant with very low p‑values, while many others have large standard errors and are not statistically meaningful. This shows the presence of multicollinearity: several features are strongly correlated, so the model predicts well overall but individual coefficient estimates are unstable.</p>
+</section>
 </section>
 <section id="polynomial-regression-model" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="polynomial-regression-model"><span class="header-section-number">3</span> Polynomial Regression model</h2>
-<div id="dd6f7a70" class="cell" data-execution_count="4">
+<div id="52a3b5c2" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> GeneralizedLinearRegression</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># train/test</span></span>
@@ -453,10 +457,14 @@ only showing top 20 rows
 </code></pre>
 </div>
 </div>
+<section id="inference-1" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="inference-1"><span class="header-section-number">3.1</span> Inference</h3>
+<p>The Polynomial Regression model also achieved very high accuracy (R² ≈ 0.9991), explaining nearly all variation in salaries. Errors were very small (RMSE ≈ 1269, MAE ≈ 439), almost the same as the linear model. The results again confirm that experience, job type, and location strongly influence pay. Looking at coefficients, a few predictors (like the second and third features) are highly significant with very low p‑values, but many others show very large standard errors and are not statistically reliable. This again points to multicollinearity: several features overlap in information, so while the model predicts salaries very well, the individual coefficient estimates remain unstable</p>
+</section>
 </section>
 <section id="random-forest-regression" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="random-forest-regression"><span class="header-section-number">4</span> Random Forest Regression</h2>
-<div id="1555d793" class="cell" data-execution_count="5">
+<div id="8193ab9e" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.regression <span class="im">import</span> RandomForestRegressor</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -489,8 +497,8 @@ only showing top 20 rows
 <span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RMSE:"</span>, rmse)</span>
 <span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"MAE:"</span>, mae)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 25:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 26:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 27:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 29:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 31:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 33:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 35:&gt;                                                         (0 + 1) / 1]                                                                                25/10/07 04:58:23 WARN DAGScheduler: Broadcasting large task binary with size 1244.7 KiB
-[Stage 37:&gt;                                                         (0 + 1) / 1][Stage 38:&gt;                                                         (0 + 1) / 1]                                                                                25/10/07 04:58:27 WARN DAGScheduler: Broadcasting large task binary with size 2.2 MiB
+<pre><code>[Stage 25:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 26:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 27:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 29:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 31:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 33:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 35:&gt;                                                         (0 + 1) / 1][Stage 36:&gt;                                                         (0 + 1) / 1]                                                                                25/10/08 02:49:59 WARN DAGScheduler: Broadcasting large task binary with size 1244.7 KiB
+[Stage 37:&gt;                                                         (0 + 1) / 1][Stage 38:&gt;                                                         (0 + 1) / 1]                                                                                25/10/08 02:50:03 WARN DAGScheduler: Broadcasting large task binary with size 2.2 MiB
 [Stage 39:&gt;                                                         (0 + 1) / 1][Stage 40:&gt;                                                         (0 + 1) / 1]                                                                                WARNING: An illegal reflective access operation has occurred
 WARNING: Illegal reflective access by org.apache.spark.util.SizeEstimator$ (file:/opt/spark-3.5.6-bin-hadoop3/jars/spark-core_2.12-3.5.6.jar) to field java.nio.charset.Charset.name
 WARNING: Please consider reporting this to the maintainers of org.apache.spark.util.SizeEstimator$
@@ -510,7 +518,7 @@ MAE: 4380.591032239985</code></pre>
 </div>
 <section id="feature-importance-plot" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="feature-importance-plot"><span class="header-section-number">4.1</span> Feature Importance Plot</h3>
-<div id="e30df786" class="cell" data-execution_count="6">
+<div id="5e263da8" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -545,7 +553,7 @@ MAE: 4380.591032239985</code></pre>
 <span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
 <span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a>plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/tmp/ipykernel_7983/192427344.py:28: FutureWarning:
+<pre><code>/tmp/ipykernel_3164/192427344.py:28: FutureWarning:
 
 
 
@@ -562,10 +570,14 @@ Passing `palette` without assigning `hue` is deprecated and will be removed in v
 </div>
 </div>
 </section>
+<section id="inference-2" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="inference-2"><span class="header-section-number">4.2</span> Inference</h3>
+<p>The Random Forest model explained about 97% of salary variation (R² ≈ 0.97). But its errors were higher (RMSE ≈ 7023, MAE ≈ 4381) compared to linear models. From feature importance, we see that SALARY_TO and SALARY_FROM are the main drivers, with years of experience adding some effect. Other features like job type and state have very small impact. This means the model predicts well, but it mostly depends on salary range fields and gives less extra insight.</p>
+</section>
 </section>
 <section id="model-comparison" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="model-comparison"><span class="header-section-number">5</span> Model Comparison</h2>
-<div id="9cbac462" class="cell" data-execution_count="7">
+<div id="a1e67c58" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pyspark.ml.evaluation <span class="im">import</span> RegressionEvaluator</span>
@@ -666,7 +678,7 @@ Generalized Linear Regression 0.999101 1269.832252  439.383598   198674.93233  5
 </div>
 <section id="visualization-comparison" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="visualization-comparison"><span class="header-section-number">5.1</span> Visualization Comparison</h3>
-<div id="e3dd7ad4" class="cell" data-execution_count="8">
+<div id="e6d917dc" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -723,7 +735,7 @@ Generalized Linear Regression 0.999101 1269.832252  439.383598   198674.93233  5
 <span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
 <span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>[Stage 57:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 58:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 59:&gt;                                                         (0 + 1) / 1]                                                                                /tmp/ipykernel_7983/3842274766.py:47: FutureWarning:
+<pre><code>[Stage 57:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 58:&gt;                                                         (0 + 1) / 1]                                                                                [Stage 59:&gt;                                                         (0 + 1) / 1]                                                                                /tmp/ipykernel_3164/3842274766.py:47: FutureWarning:
 
 
 
@@ -739,6 +751,10 @@ Passing `palette` without assigning `hue` is deprecated and will be removed in v
 </div>
 </div>
 </div>
+</section>
+<section id="inference-3" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="inference-3"><span class="header-section-number">5.2</span> Inference</h3>
+<p>Both the Generalized Linear Regression and Polynomial Regression models performed almost identically, with R² ≈ 0.9991 and very low errors (RMSE ≈ 1269, MAE ≈ 439). Their AIC and BIC values are also very close, showing no real advantage of adding polynomial terms. The Random Forest model explained less variation (R² ≈ 0.97) and had much higher errors (RMSE ≈ 7023, MAE ≈ 4381). Since AIC and BIC are not available for Random Forest, comparison is based only on accuracy metrics. Overall, the linear models clearly outperform Random Forest for this dataset. Between them, the simpler Generalized Linear Regression is preferable, as it achieves the same accuracy with lower complexity and easier interpretation.</p>
 </section>
 </section>
 

@@ -23,6 +23,10 @@ execute:
   freeze: auto
 ---
 
+## Github URL
+https://github.com/met-ad-688/assignment-04-anush-09.git
+
+
 ```{python}
 #| eval: true
 #| echo: true
@@ -99,7 +103,7 @@ poly_assembler = VectorAssembler(
     inputCols=["features", "MIN_YEARS_EXPERIENCE_SQ"],
     outputCol="features_poly"
 )
-df_final = poly_assembler.transform(df_poly) # final structure
+df_final = poly_assembler.transform(df_poly)
 df_final.show(5)
 ```
 
@@ -153,6 +157,10 @@ except Exception as e:
     print("Coefficient statistics not available (L-BGFS fallback):", str(e))
 # df_final.printSchema()
 ```
+### Inference
+The Generalized Linear Regression model gave very high accuracy (R² ≈ 0.9991), explaining almost all variation in salaries. Prediction errors were very small (RMSE ≈ 1269, MAE ≈ 439). As expected, more years of experience are linked with higher pay, and job type and location also matter.
+Looking at coefficients, some predictors (like the second and third features) are highly significant with very low p‑values, while many others have large standard errors and are not statistically meaningful. This shows the presence of multicollinearity: several features are strongly correlated, so the model predicts well overall but individual coefficient estimates are unstable.
+
 
 ##  Polynomial Regression model
 ```{python}
@@ -212,6 +220,10 @@ try:
 except Exception as e:
     print("Coefficient statistics not available (L-BGFS fallback):", str(e))
 ```
+### Inference
+The Polynomial Regression model also achieved very high accuracy (R² ≈ 0.9991), explaining nearly all variation in salaries. Errors were very small (RMSE ≈ 1269, MAE ≈ 439), almost the same as the linear model. The results again confirm that experience, job type, and location strongly influence pay.
+Looking at coefficients, a few predictors (like the second and third features) are highly significant with very low p‑values, but many others show very large standard errors and are not statistically reliable. This again points to multicollinearity: several features overlap in information, so while the model predicts salaries very well, the individual coefficient estimates remain unstable
+
 
 ## Random Forest Regression
 
@@ -294,6 +306,9 @@ plt.savefig("_output/rf_feature_importance.png")
 plt.show()
 plt.close()
 ```
+### Inference
+The Random Forest model explained about 97% of salary variation (R² ≈ 0.97). But its errors were higher (RMSE ≈ 7023, MAE ≈ 4381) compared to linear models. From feature importance, we see that SALARY_TO and SALARY_FROM are the main drivers, with years of experience adding some effect. Other features like job type and state have very small impact. This means the model predicts well, but it mostly depends on salary range fields and gives less extra insight.
+
 
 ## Model Comparison
 
@@ -437,3 +452,7 @@ plt.show()
 plt.close()
 ```
 
+### Inference
+Both the Generalized Linear Regression and Polynomial Regression models performed almost identically, with R² ≈ 0.9991 and very low errors (RMSE ≈ 1269, MAE ≈ 439). Their AIC and BIC values are also very close, showing no real advantage of adding polynomial terms.
+The Random Forest model explained less variation (R² ≈ 0.97) and had much higher errors (RMSE ≈ 7023, MAE ≈ 4381). Since AIC and BIC are not available for Random Forest, comparison is based only on accuracy metrics.
+Overall, the linear models clearly outperform Random Forest for this dataset. Between them, the simpler Generalized Linear Regression is preferable, as it achieves the same accuracy with lower complexity and easier interpretation.
